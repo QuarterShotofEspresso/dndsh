@@ -4,18 +4,6 @@
 #include <iostream>
 #include <ctime>
 
-std::string toString(char *characterString, int length) {
-    
-    std::string stringString = "";
-
-    for (int i = 0; i < length; i++) {
-        stringString += characterString[i];
-    }
-
-    return stringString;
-}
-
-
 int roll(int times, int modulus) {
 
     int sum = 0;
@@ -24,29 +12,40 @@ int roll(int times, int modulus) {
         sum += rand() % modulus;
     }
 
-    return sum;
+    return sum + 1;
 }
 
 
-
-int main(int argc, char **argv) {
-
+int main (void) {
+    
     srand((int)time(NULL));
 
-    int rollStringLen = sizeof(argv) / sizeof(char);
-    std::string rollString = toString(argv[1], rollStringLen);
+    std::string rollString;
     int rollTimes = 0;
     int rollMod = 1;
+    int rollStringLen = 0;
+    
+    while (true) {
 
-    if (rollString.find('d') == 0) {
-        rollTimes = 1; 
-    }
-    else {
-        rollTimes = stoi(rollString.substr(0, rollString.find('d')));
+        do {
+            std::cin >> rollString;
+        } while (rollString.length() == 0);
+
+        if (rollString == "exit") {
+            break;
+        }
+
+        rollStringLen = rollString.length();
+    
+        if (rollString.find('d') == 0) {
+            rollTimes = 1; 
+        } else {
+            rollTimes = stoi(rollString.substr(0, rollString.find('d')));
+        }
+    
+        rollMod = stoi(rollString.substr(rollString.find('d') + 1, rollString.length()));
+        std::cout << "Rolled: " << roll(rollTimes, rollMod) << std::endl;
     }
     
-    rollMod = stoi(rollString.substr(rollString.find('d') + 1, rollString.length()));
-    std::cout << "Rolled: " << roll(rollTimes, rollMod) << std::endl;
-
     return 0;
 }

@@ -1,52 +1,58 @@
 #include "character.hpp"
+#include "linux_color_schemes.hpp"
 
 void Character::prompt( void ) {
     
     srand((int)time(NULL));
  
     std::string command;
+    std::string promptColor = BOLDGREEN;
+    int returnStatus;
 
     while( true ) {
 
-
-        std::cout << "$> ";
+        std::cout << promptColor << "$> " << RESET;
         std::cin  >> command;
 
-        // debugging Statment
-        //std::cout << command.find('d') << std::endl;
+        promptColor = BOLDGREEN;
 
         // command options
         if( command == "spell" ) {
             std::cin >> command;
-            cmd_SPELL( command );
+            returnStatus = cmd_SPELL( command );
         } else if( command == "stats" ) {
-            cmd_STATS();
+            returnStatus = cmd_STATS();
         } else if( command == "help" ) {
-            cmd_HELP();
+            returnStatus = cmd_HELP();
         } else if( command == "health" ) {
             std::cin >> command;
-            cmd_HEALTH( command );
+            returnStatus = cmd_HEALTH( command );
         } else if( command == "mod" ) {
             getline( std::cin, command );
-            cmd_MODSTAT( command );
+            returnStatus = cmd_MODSTAT( command );
         } else if( command == "add" ) {
             getline( std::cin, command );
-            cmd_ADDSTAT( command );
+            returnStatus = cmd_ADDSTAT( command );
         } else if( command == "remove" ) {
             std::cin >> command;
-            cmd_RMVSTAT( command );
+            returnStatus = cmd_RMVSTAT( command );
         } else if( command == "load" ) {
             std::cin >> command;
-            cmd_RMVSTAT( command );
+            returnStatus = cmd_RMVSTAT( command );
         } else if( command == "store" ) {
             std::cin >> command;
-            cmd_RMVSTAT( command );
+            returnStatus = cmd_RMVSTAT( command );
         } else if( command.find('d') < command.size() ) {
-            cmd_ROLL( command );
+            returnStatus = cmd_ROLL( command );
         } else if( command == "exit") {
             break;
         } else {
-            std::cout << "ERR: Unknown Command" << std::endl;
+            std::cout << BOLDRED << "ERR: " << RESET << RED << "Unknown Command" << RESET << std::endl;
+            returnStatus = 1;
+        }
+
+        if( returnStatus ) {
+            promptColor = BOLDRED;
         }
 
     }
@@ -54,7 +60,7 @@ void Character::prompt( void ) {
     std::cout << "Save Character? [Y/n] ";
     std::cin  >> command;
     if((command == "Y") || (command == "y")) {
-        std::cout << "Path to existing file or create new file: " << std::endl;
+        std::cout << "Path to existing file or create new file: ";
         std::cin >> command;
         std::cout << "Saving Character..." << std::endl;
         cmd_STORE( command );
@@ -68,13 +74,8 @@ void Character::prompt( void ) {
 
 int Character::cmd_ROLL( std::string command ) {
 
-    if( command.length() == 0 ) {
-        std::cout << "Command Incorrect Usage:\n<Total Rolls>d<Dice Type>" << std::endl;
-        return 1;
-    }
-    
-    if( command == "exit" ) {
-        std::cout << "Exiting command sequence: ROLL" << std::endl;
+    if( command.length() == 1 ) {
+        std::cout << BOLDRED << "ERR: " << RESET << RED << "Incorrect Command Usage: " << RESET << CYAN << " <total_rolls>d<dice_type>" << RESET << std::endl;
         return 1;
     }
 
@@ -89,7 +90,7 @@ int Character::cmd_ROLL( std::string command ) {
     }
     
     rollMod = stoi(command.substr(command.find('d') + 1, command.length()));
-    std::cout << "Rolled: " << roll(rollTimes, rollMod) << std::endl;
+    std::cout << MAGENTA << "Rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
     
     
     return 0;

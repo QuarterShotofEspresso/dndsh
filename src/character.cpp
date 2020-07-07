@@ -6,7 +6,7 @@ void Character::prompt( void ) {
     srand((int)time(NULL));
  
     std::string command;
-    std::string promptColor = BOLDGREEN;
+    std::string promptColor = GREEN;
     int returnStatus;
 
     while( true ) {

@@ -1,7 +1,7 @@
-all : bin/dndterm
+all : bin/dndsh
 
-bin/dndterm : build/main.o build/character.o
-	g++ -o bin/dnd build/main.o build/character.o
+bin/dndsh : build/main.o build/character.o
+	g++ -o bin/dndsh build/main.o build/character.o -lreadline
 
 build/main.o : src/main.cpp
 	g++ -c -Wall -Iincludes -o build/main.o src/main.cpp

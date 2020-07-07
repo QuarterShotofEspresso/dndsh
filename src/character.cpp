@@ -14,7 +14,7 @@ void Character::prompt( void ) {
         std::cout << promptColor << "$> " << RESET;
         std::cin  >> command;
 
-        promptColor = BOLDGREEN;
+        promptColor = GREEN;
 
         // command options
         if( command == "spell" ) {
@@ -52,7 +52,7 @@ void Character::prompt( void ) {
         }
 
         if( returnStatus ) {
-            promptColor = BOLDRED;
+            promptColor = RED;
         }
 
     }

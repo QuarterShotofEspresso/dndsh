@@ -3,17 +3,7 @@
 
 #include <string>
 #include <vector>
-
-/*
-class CharacterData {
-    private:
-    std::vector<std::string> data;
-
-    public:
-    CharacterData();
-    std::string valueByKey( std::string key );
-
-};*/
+#include <iostream>
 
 // data stored as {<attribute tag>.<attribute value/max>:<attribute temporary/current>}
 // data stored as {"STRENGTH.5", "Health.25:16", "nAmE.Tywin"}
@@ -43,17 +33,16 @@ class Character {
     int cmd_LOAD  ( std::string path );
     int cmd_STORE ( std::string path );
 
+
+    private:
     // helper function(s)
-    friend int roll( int times, int modulus );
-    friend int valueByKey( std::string key );
-    friend std::string upper( std::string input );
+    int roll( int times, int modulus );
+    std::string valueByKey( std::string key );
+    std::string upper( std::string input );
     // +<modifier> : increase by <modifier>
     // <modifier>  : set value to <modifier>
     // -<modifier> : substract by <modifier>
-    friend int modifyRule( std::string modifyBy );
+    int modifyRule( std::string modifyBy );
 };
-
-// global helper function(s)
-
 
 #endif //__CHARACTER_HPP__

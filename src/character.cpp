@@ -1,27 +1,19 @@
 #include "character.hpp"
-#include <iostream>
-
-
-//CharacterData() { }
-
-
-Character::Character() {
-
-    this->data = nullptr;
-
-}
-
 
 void Character::prompt( void ) {
     
     srand((int)time(NULL));
+ 
+    std::string command;
 
     while( true ) {
 
-        std::string command;
 
         std::cout << "$> ";
         std::cin  >> command;
+
+        // debugging Statment
+        //std::cout << command.find('d') << std::endl;
 
         // command options
         if( command == "spell" ) {
@@ -49,8 +41,8 @@ void Character::prompt( void ) {
         } else if( command == "store" ) {
             std::cin >> command;
             cmd_RMVSTAT( command );
-        } else if( command.find('d') > -1 ) {
-            command_ROLL( command );
+        } else if( command.find('d') < command.size() ) {
+            cmd_ROLL( command );
         } else if( command == "exit") {
             break;
         } else {
@@ -61,9 +53,11 @@ void Character::prompt( void ) {
 
     std::cout << "Save Character? [Y/n] ";
     std::cin  >> command;
-    if( upper(command) == "Y" ) {
+    if((command == "Y") || (command == "y")) {
+        std::cout << "Path to existing file or create new file: " << std::endl;
+        std::cin >> command;
         std::cout << "Saving Character..." << std::endl;
-        // TODO: Implement cmd_STORE
+        cmd_STORE( command );
         std::cout << "Character Saved." << std::endl;
     }
 
@@ -74,12 +68,12 @@ void Character::prompt( void ) {
 
 int Character::cmd_ROLL( std::string command ) {
 
-    if (command.length() == 0) {
-        std::cout << "Command Incorrect Usage:\n<Total Rolls>d<Dice Type>\n$> ";
+    if( command.length() == 0 ) {
+        std::cout << "Command Incorrect Usage:\n<Total Rolls>d<Dice Type>" << std::endl;
         return 1;
     }
     
-    if (rollString == "exit") {
+    if( command == "exit" ) {
         std::cout << "Exiting command sequence: ROLL" << std::endl;
         return 1;
     }
@@ -156,7 +150,7 @@ int Character::cmd_STORE( std::string path ) {
 }
 
 ////// Helper Functions //////
-int roll(int times, int modulus) {
+int Character::roll(int times, int modulus) {
 
     int sum = 0;
 
@@ -168,13 +162,13 @@ int roll(int times, int modulus) {
 }
 
 
-std::string valueByKey( std::string key ) {
+std::string Character::valueByKey( std::string key ) {
     
     std::vector<std::string>::iterator ptr;
 
     for( ptr = this->data.begin(); ptr < this->data.end(); ptr++ ) {
-        if( upper(*ptr.substr(0, *ptr.find('.'))) == upper(key) ) {
-            return *ptr.substr(*ptr.find('.') + 1, *ptr.size());
+        if( upper((*ptr).substr(0, (*ptr).find('.'))) == upper(key) ) {
+            return (*ptr).substr((*ptr).find('.') + 1, (*ptr).size());
         }
     }
 
@@ -182,7 +176,7 @@ std::string valueByKey( std::string key ) {
 }
 
 
-std::string upper( std::string input ) {
+std::string Character::upper( std::string input ) {
     
     for( int i = 0; i < input.size(); i++ ) {
         input.at(i) = toupper( input.at(i) );
@@ -193,7 +187,7 @@ std::string upper( std::string input ) {
 
 
 int Character::modifyRule( std::string modifyBy ) {
-    if( modifyBy.at(0) == + ) {
+    if( modifyBy.at(0) == '+' ) {
         //TODO: Increase By
     } else if( modifyBy.at(0) == '-' ) {
         //TODO: Decrease By

@@ -2,7 +2,8 @@
 
 int main( void ) {
 
-    cmd();
+    Character NewCharacter;
+    NewCharacter.prompt();
 
     return 0;
 }

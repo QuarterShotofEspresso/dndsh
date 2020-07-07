@@ -1,20 +1,23 @@
 #include "character.hpp"
 #include "linux_color_schemes.hpp"
+#include <readline/readline.h>
+#include <readline/history.h>
 
 void Character::prompt( void ) {
     
     srand((int)time(NULL));
  
     std::string command;
-    std::string promptColor = GREEN;
-    int returnStatus;
+    int returnStatus = 0;
 
     while( true ) {
 
-        std::cout << promptColor << "$> " << RESET;
-        std::cin  >> command;
+        if ( returnStatus ) {
+            command = readline( "\033[31m$> \033[0m" );
+        } else {
+            command = readline( "\033[32m$> \033[0m" );
+        }
 
-        promptColor = GREEN;
 
         // command options
         if( command == "spell" ) {
@@ -47,12 +50,8 @@ void Character::prompt( void ) {
         } else if( command == "exit") {
             break;
         } else {
-            std::cout << BOLDRED << "ERR: " << RESET << RED << "Unknown Command" << RESET << std::endl;
+            std::cout << BOLDRED << "error: " << RESET << RED << "Unknown Command" << RESET << std::endl;
             returnStatus = 1;
-        }
-
-        if( returnStatus ) {
-            promptColor = RED;
         }
 
     }
@@ -75,7 +74,7 @@ void Character::prompt( void ) {
 int Character::cmd_ROLL( std::string command ) {
 
     if( command.length() == 1 ) {
-        std::cout << BOLDRED << "ERR: " << RESET << RED << "Incorrect Command Usage: " << RESET << CYAN << " <total_rolls>d<dice_type>" << RESET << std::endl;
+        std::cout << BOLDRED << "error: " << RESET << RED << "Incorrect Command Usage: " << RESET << CYAN << " <total_rolls>d<dice_type>" << RESET << std::endl;
         return 1;
     }
 

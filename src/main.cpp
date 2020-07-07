@@ -1,51 +1,8 @@
-#include <cmath>
-#include <cstdlib>
-#include <string>
-#include <iostream>
-#include <ctime>
+#include "character.hpp"
 
-int roll(int times, int modulus) {
+int main( void ) {
 
-    int sum = 0;
+    cmd();
 
-    for (int i = 0; i < times; i++) {
-        sum += rand() % modulus;
-    }
-
-    return sum + 1;
-}
-
-
-int main (void) {
-    
-    srand((int)time(NULL));
-
-    std::string rollString;
-    int rollTimes = 0;
-    int rollMod = 1;
-    int rollStringLen = 0;
-    
-    while (true) {
-
-        do {
-            std::cin >> rollString;
-        } while (rollString.length() == 0);
-
-        if (rollString == "exit") {
-            break;
-        }
-
-        rollStringLen = rollString.length();
-    
-        if (rollString.find('d') == 0) {
-            rollTimes = 1; 
-        } else {
-            rollTimes = stoi(rollString.substr(0, rollString.find('d')));
-        }
-    
-        rollMod = stoi(rollString.substr(rollString.find('d') + 1, rollString.length()));
-        std::cout << "Rolled: " << roll(rollTimes, rollMod) << std::endl;
-    }
-    
     return 0;
 }

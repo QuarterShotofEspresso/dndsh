@@ -41,7 +41,7 @@ class DnDsh {
     private:
     // helper function(s)
     int roll( int times, int modulus );
-    std::string valueByKey( std::string key );
+    int doesKeyExist( std::string key );
     std::string upper( std::string input );
     // +<modifier> : increase by <modifier>
     // <modifier>  : set value to <modifier>

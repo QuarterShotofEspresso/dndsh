@@ -93,7 +93,11 @@ int DnDsh::cmd_STATS( void ) {
 
 
 int DnDsh::cmd_HELP( void ) {
-    std::cout << "Need to implement HELP" << std::endl;
+    
+    std::cout <<
+        "Greetings weary traveler! You're long winding path ripe with "
+        "";
+
     return 0;
 }
 
@@ -105,7 +109,15 @@ int DnDsh::cmd_SPELL( std::string level ) {
 
 
 int DnDsh::cmd_HEALTH( std::string modifyBy ) {
-    std::cout << "Need to implement HEALTH" << std::endl;
+   
+    if( this->doesKeyExist( "HEALTH" ) < 0 ) {
+        std::cout << CYAN << "Key: " << BOLDWHITE << "HEALTH" << RESET << CYAN 
+        << " does not exist." << std::endl 
+        << "Please add the key using the " << YELLOW << "add " << CYAN << "command" << std::endl;
+    } else {
+        if( modifyBy.at(0) == '+' ) {
+            std::cout << "connect " << 
+
     return 0;
 }
 
@@ -139,6 +151,8 @@ int DnDsh::cmd_STORE( std::string path ) {
     return 0;
 }
 
+
+
 ////// Helper Functions //////
 int DnDsh::roll(int times, int modulus) {
 
@@ -152,17 +166,15 @@ int DnDsh::roll(int times, int modulus) {
 }
 
 
-std::string DnDsh::valueByKey( std::string key ) {
-    
-    std::vector<std::string>::iterator ptr;
+int DnDsh::doesKeyExist( std::string key ) {
 
-    for( ptr = this->characterData.begin(); ptr < this->characterData.end(); ptr++ ) {
-        if( upper((*ptr).substr(0, (*ptr).find('.'))) == upper(key) ) {
-            return (*ptr).substr((*ptr).find('.') + 1, (*ptr).size());
+    for( int i = 0; i < this->characterData.size(); i++ ) {
+        if( this->characterData.at(i).substr(0, data.find('.')) == this->upper(key) ) {
+            return i;
         }
     }
 
-    return "";
+    return -1;
 }
 
 

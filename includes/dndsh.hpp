@@ -1,20 +1,25 @@
-#ifndef __CHARACTER_HPP__
-#define __CHARACTER_HPP__
+#ifndef __DNDSH_HPP__
+#define __DNDSH_HPP__
 
 #include <string>
 #include <vector>
 #include <iostream>
+#include <string.h>
+#include <stdlib.h>
+#include <readline/readline.h>
+#include "linux_color_schemes.hpp"
 
 // data stored as {<attribute tag>.<attribute value/max>:<attribute temporary/current>}
 // data stored as {"STRENGTH.5", "Health.25:16", "nAmE.Tywin"}
-class Character {
+class DnDsh {
+
     private:
-    std::vector<std::string> data;
+    std::vector<std::string> characterData;
+
 
     public:
     // initialize and loop command prompter
-    void prompt( void ); // launch terminal
-
+    int cmd_REQ( std::string command ); // launch terminal
 
     /////// command sequences///////
     // miscillaneous sequences
@@ -45,4 +50,4 @@ class Character {
     int modifyRule( std::string modifyBy );
 };
 
-#endif //__CHARACTER_HPP__
+#endif //__DNDSH_HPP__

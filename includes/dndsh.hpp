@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <string.h>
-#include <stdlib.h>
 #include <readline/readline.h>
 #include "linux_color_schemes.hpp"
 
@@ -18,6 +16,7 @@ class DnDsh {
 
 
     public:
+    DnDsh();
     // initialize and loop command prompter
     int cmd_REQ( std::string command ); // launch terminal
 

@@ -1,5 +1,14 @@
 #include "dndsh.hpp"
 
+DnDsh::DnDsh() {
+    this->characterData = {
+        "NAME.Tywin",
+        "STRENGTH.15:10",
+        "HEALTH.25:10",
+        "DEXTERITY.10"
+    };
+}
+
 int DnDsh::cmd_REQ( std::string command ) {
     
     int returnStatus = 0;
@@ -55,7 +64,7 @@ int DnDsh::cmd_ROLL( std::string command ) {
     }
     
     rollMod = stoi(command.substr(command.find('d') + 1, command.length()));
-    std::cout << BLUE << "Rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
+    std::cout << CYAN << "Rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
     
     
     return 0;
@@ -63,7 +72,22 @@ int DnDsh::cmd_ROLL( std::string command ) {
 
 
 int DnDsh::cmd_STATS( void ) {
-    std::cout << "Need to implement STATS" << std::endl;
+
+    std::string datum;
+
+    for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
+        datum = this->characterData.at(i);
+        std::cout << BOLDWHITE << datum.substr(0, datum.find('.')) << RESET << CYAN << ": " << RESET;
+        if( datum.find(':') < datum.size() ) {
+            std::cout << CYAN << "Max: " << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.find(':') - (datum.find('.') + 1)) << RESET << CYAN << " | ";
+            std::cout << "Current: " << BOLDWHITE << datum.substr(datum.find(':') + 1, datum.size()) << RESET;
+        } else {
+            std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.size()) << RESET;
+        }
+    
+        std::cout << std::endl;
+    }
+
     return 0;
 }
 

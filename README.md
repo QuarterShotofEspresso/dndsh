@@ -14,7 +14,8 @@ Well... I see. Hmmm... Perhaps... Hmm... give me a moment.
 Here, perhaps dndsh will help you with your future endeavors. Yes, there's a `help` command
 that lists and explains all available commands. 
 No, it will not restore your self-esteem--although you can always `mod charisma 20` if you know
-what I mean. (Snooty laughter commences).
+what I mean. (Snooty laughter commences). How do you install it? 
+Why it's as easy as moving into the directory and typing `./configure` then `make`!
 What's that? You must leave!
 Your comrades await for you? Well, good luck sir! And SAFE TRAVELS! MAY
 `<enter_deity_here>` BE WITH YOU!

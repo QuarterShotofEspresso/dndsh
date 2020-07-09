@@ -1,4 +1,5 @@
 #include "dndsh.hpp"
+#include "help_messages.hpp"
 
 DnDsh::DnDsh() {
     this->characterData = {
@@ -9,37 +10,59 @@ DnDsh::DnDsh() {
     };
 }
 
-int DnDsh::cmd_REQ( std::string command ) {
-    
+int DnDsh::cmd_REQ( std::string input ) {
+   
+    std::istringstream inputStream(input);
+    std::string token;
+    std::list<std::string> commandTokens;
     int returnStatus = 0;
 
+
+    while( inputStream >> token ) {
+        commandTokens.push_back( token );
+    }
+    commandTokens.push_back("");
+
     // command options
-    if( command == "spell" ) {
-        returnStatus = cmd_SPELL( command );
-    } else if( command == "stats" ) {
-        returnStatus = cmd_STATS();
-    } else if( command == "help" ) {
-        returnStatus = cmd_HELP();
-    } else if( command == "health" ) {
-        returnStatus = cmd_HEALTH( command );
-    } else if( command == "mod" ) {
-        returnStatus = cmd_MODSTAT( command );
-    } else if( command == "add" ) {
-        returnStatus = cmd_ADDSTAT( command );
-    } else if( command == "remove" ) {
-        returnStatus = cmd_RMVSTAT( command );
-    } else if( command == "load" ) {
-        returnStatus = cmd_RMVSTAT( command );
-    } else if( command == "store" ) {
-        returnStatus = cmd_RMVSTAT( command );
-    } else if( command.find('d') < command.size() ) {
-        returnStatus = cmd_ROLL( command );
-    } else if( command == "exit") {
+    if( commandTokens.front() == "spell" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_SPELL( commandTokens );
+    } else if( commandTokens.front() == "stats" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_STATS( commandTokens.front() );
+    } else if( commandTokens.front() == "help" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_HELP( commandTokens.front() );
+    } else if( commandTokens.front() == "health" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_HEALTH( commandTokens );
+    } else if( commandTokens.front() == "mod" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_MODSTAT( commandTokens );
+    } else if( commandTokens.front() == "add" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_ADDSTAT( commandTokens );
+    } else if( commandTokens.front() == "rm" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_RMVSTAT( commandTokens.front() );
+    } else if( commandTokens.front() == "ld" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_LOAD( commandTokens.front() );
+    } else if( commandTokens.front() == "st" ) {
+        commandTokens.pop_front();
+        returnStatus = cmd_STORE( commandTokens.front() );
+    } else if( input.find('d') < input.size() ) {
+        returnStatus = cmd_ROLL( input );
+    } else if( commandTokens.front() == "exit") {
         returnStatus = -1;
+    } else if( input == "" ) {
+        returnStatus = 0;
     } else {
         std::cout << BOLDRED << "error: " << RESET << RED << "Unknown Command" << RESET << std::endl;
         returnStatus = 1;
     }
+
+    commandTokens.clear();
 
     return returnStatus;
 
@@ -71,16 +94,17 @@ int DnDsh::cmd_ROLL( std::string command ) {
 }
 
 
-int DnDsh::cmd_STATS( void ) {
+// Sample Usage:    stats [<key>]           //NOTE: [<key>] entered empty will print out every stat
+int DnDsh::cmd_STATS( const std::string &key ) {
 
     std::string datum;
 
     for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
         datum = this->characterData.at(i);
-        std::cout << BOLDWHITE << datum.substr(0, datum.find('.')) << RESET << CYAN << ": " << RESET;
+        std::cout << BOLDWHITE << datum.substr(0, datum.find('.')) << RESET << CYAN << ":\t" << RESET;
         if( datum.find(':') < datum.size() ) {
-            std::cout << CYAN << "Max: " << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.find(':') - (datum.find('.') + 1)) << RESET << CYAN << " | ";
-            std::cout << "Current: " << BOLDWHITE << datum.substr(datum.find(':') + 1, datum.size()) << RESET;
+            std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.find(':') - (datum.find('.') + 1)) << RESET 
+            << CYAN << "/" << BOLDRED << datum.substr(datum.find(':') + 1, datum.size()) << RESET;
         } else {
             std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.size()) << RESET;
         }
@@ -92,61 +116,140 @@ int DnDsh::cmd_STATS( void ) {
 }
 
 
-int DnDsh::cmd_HELP( void ) {
-    
-    std::cout <<
-        "Greetings weary traveler! You're long winding path ripe with "
-        "";
 
-    return 0;
+// Sample Usage:    help [<command>]    //NOTE: absent [<command>] prints all available commands
+int DnDsh::cmd_HELP( const std::string &command ) {
+    
+    int returnStatus = 0;
+
+    if( command == "" ) {
+        std::cout << DNDSH_COMMAND_HELP_LIST << std::endl;
+    }
+
+    else if( command == "roll" ) {
+        std::cout << DNDSH_ROLL_CMD_HELP << std::endl;
+    }
+    
+    else if( command == "stats" ) {
+        std::cout << DNDSH_STATS_CMD_HELP << std::endl;
+    }
+
+    else if( command == "spell" ) {
+        std::cout << DNDSH_SPELL_CMD_HELP << std::endl;
+    }
+
+    else if( command == "health" ) {
+        std::cout << DNDSH_HEALTH_CMD_HELP << std::endl;
+    }
+
+    else if( command == "mod" ) {
+        std::cout << DNDSH_MOD_CMD_HELP << std::endl;
+    }
+
+    else if( command == "add" ) {
+        std::cout << DNDSH_ADD_CMD_HELP << std::endl;
+    }
+
+    else if( command == "rm" ) {
+        std::cout << DNDSH_RM_CMD_HELP << std::endl;
+    }
+
+    else if( command == "ld" ) {
+        std::cout << DNDSH_LD_CMD_HELP << std::endl;
+    }
+    
+    else if( command == "st" ) {
+        std::cout << DNDSH_ST_CMD_HELP << std::endl;
+    }
+
+    else {
+        std::cout << BOLDRED << "error: " << RESET << RED << "Unknown command type \'help\' for a list of commands" << std::endl;
+        returnStatus = 1;
+    }
+
+    return returnStatus;
+
 }
 
-
-int DnDsh::cmd_SPELL( std::string level ) {
+// Sample Usage:    spell <1-9> [<modifier>]        //NOTE: [<modifier>] is by default assumed as: -1
+//                  spell reset all
+//                  spell reset <1-9>
+//                  spell master <1-9> <modifier>
+int DnDsh::cmd_SPELL( std::list<std::string> &level ) {
     std::cout << "Need to implement SPELL" << std::endl;
     return 0;
 }
 
 
-int DnDsh::cmd_HEALTH( std::string modifyBy ) {
+
+// Sample Usage:    health <modifier>
+//                  heatlh reset
+//                  heatlh master <modifer>
+int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
    
-    if( this->doesKeyExist( "HEALTH" ) < 0 ) {
+    int returnStatus = 0;
+
+    if( this->locateKey( "HEALTH" ) < 0 ) {
         std::cout << CYAN << "Key: " << BOLDWHITE << "HEALTH" << RESET << CYAN 
         << " does not exist." << std::endl 
-        << "Please add the key using the " << YELLOW << "add " << CYAN << "command" << std::endl;
-    } else {
-        if( modifyBy.at(0) == '+' ) {
-            std::cout << "connect " << 
+        << "Please add the key using the \'add\' command" << RESET << std::endl;
+        returnStatus = 1;
+    } 
 
-    return 0;
+    else if( modifyBy.front() == "" ) {
+        std::cout << BOLDRED << "error: " << RESET << RED << "Incorrect Usage: "
+        "Type \'help health\' to learn more" << RESET << std::endl;
+        returnStatus = 1;
+    }
+
+    else if( modifyBy.front() == "master" ) {
+        modifyBy.pop_front();
+        returnStatus = this->modifyRule( "HEALTH", modifyBy.front() );
+    }
+
+    else {
+        returnStatus = this->modifyRule( "HEALTH", modifyBy.front() );
+    }
+
+    return returnStatus;
 }
 
 
-int DnDsh::cmd_MODSTAT( std::string modifier ) {
+
+// Sample Usage:    mod <key> <new_value> [<new_temp_value>]    //NOTE: [<new_temp_value>] will by default leave everything unchanged
+int DnDsh::cmd_MODSTAT( std::list<std::string> &modifier ) {
     std::cout << "Need to implement MODSTAT" << std::endl;
     return 0;
 }
 
 
-int DnDsh::cmd_ADDSTAT( std::string stat ) {
+
+// Sample Usage:    add <new_key> <new_value> [<new_temp_value>]    //NOTE: [<new_temp_value>] will by deafult skip appending a new_temp_value to new_key
+int DnDsh::cmd_ADDSTAT( std::list<std::string> &stat ) {
     std::cout << "Need to implement ADDSTAT" << std::endl;
     return 0;
 }
 
 
-int DnDsh::cmd_RMVSTAT( std::string stat ) {
+
+// Sample Usage:    rm  <key>
+int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
     std::cout << "Need to implement RMVSTAT" << std::endl;
     return 0;
 }
 
 
-int DnDsh::cmd_LOAD( std::string path ) {
+
+// Sample Usagae:   ld <file_path>
+int DnDsh::cmd_LOAD( const std::string &path ) {
     std::cout << "Need to implement LOAD" << std::endl;
     return 0;
 }
 
 
-int DnDsh::cmd_STORE( std::string path ) {
+
+// Sample Usage:    st <file_path>
+int DnDsh::cmd_STORE( const std::string &path ) {
     std::cout << "Need to implement STORE" << std::endl;
     return 0;
 }
@@ -166,10 +269,12 @@ int DnDsh::roll(int times, int modulus) {
 }
 
 
-int DnDsh::doesKeyExist( std::string key ) {
+int DnDsh::locateKey( std::string key ) {
+    
+    std::string capKey = this->upper( key );
 
     for( int i = 0; i < this->characterData.size(); i++ ) {
-        if( this->characterData.at(i).substr(0, data.find('.')) == this->upper(key) ) {
+        if( this->characterData.at(i).substr(0, characterData.at(i).find('.')) == capKey ) {
             return i;
         }
     }
@@ -188,14 +293,61 @@ std::string DnDsh::upper( std::string input ) {
 }
 
 
-int DnDsh::modifyRule( std::string modifyBy ) {
-    if( modifyBy.at(0) == '+' ) {
-        //TODO: Increase By
-    } else if( modifyBy.at(0) == '-' ) {
-        //TODO: Decrease By
+int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
+
+    int returnStatus = 0;
+
+    int locationOfKey = this->locateKey( key );
+    std::string datum = this->characterData.at(locationOfKey);
+    int locationOfTempValue = datum.find(':');
+    bool tempValueExists = ( locationOfTempValue < datum.size() );
+    int maxValue = std::stoi(datum.substr(datum.find('.') + 1, datum.find(':')));
+    std::string partDatum;
+    int newTempValue;
+
+    if( tempValueExists ) {
+        partDatum = datum.substr(0, locationOfTempValue);
+        newTempValue = std::stoi(datum.substr(datum.find(':') + 1, datum.size()));
     } else {
-        //TODO: Set To
+        partDatum = datum.substr(0, datum.size());
+        newTempValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size()));
     }
 
-    return 0;
+
+    if( (modifyBy.at(0) == '+') && tempValueExists ) {
+        newTempValue += std::stoi(modifyBy.substr(1, modifyBy.size())); 
+    }
+
+    else if( modifyBy.at(0) == '-' ) {
+        newTempValue -= std::stoi(modifyBy.substr(1, modifyBy.size()));
+    }
+
+    else if( isdigit(modifyBy.at(0)) ) {
+        newTempValue = std::stoi(modifyBy);
+    }
+
+    else if( modifyBy == "reset" ) {
+        newTempValue = std::stoi(partDatum.substr(partDatum.find('.') + 1, partDatum.size()));
+    }
+
+    else {
+        std::cout << BOLDRED << "error: " << RESET << RED << "modifier unknown" << RESET << std::endl;
+        returnStatus = 1;
+    }    
+
+    if( newTempValue < 0 ) { 
+        newTempValue = 0;
+    } else if( newTempValue > maxValue ) {
+        newTempValue = maxValue;
+    }
+
+    this->characterData.at(locationOfKey) = partDatum + ":" + std::to_string( newTempValue );        
+
+    return returnStatus;
 }
+
+
+
+
+
+

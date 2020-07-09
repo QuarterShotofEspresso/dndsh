@@ -3,9 +3,11 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <iostream>
 #include <readline/readline.h>
 #include "linux_color_schemes.hpp"
+#include <sstream>
 
 // data stored as {<attribute tag>.<attribute value/max>:<attribute temporary/current>}
 // data stored as {"STRENGTH.5", "Health.25:16", "nAmE.Tywin"}
@@ -18,35 +20,35 @@ class DnDsh {
     public:
     DnDsh();
     // initialize and loop command prompter
-    int cmd_REQ( std::string command ); // launch terminal
+    int cmd_REQ( std::string input ); // launch terminal
 
     /////// command sequences///////
     // miscillaneous sequences
     int cmd_ROLL    ( std::string command );
-    int cmd_STATS   ( void );
-    int cmd_HELP    ( void );
+    int cmd_STATS   ( const std::string &key );
+    int cmd_HELP    ( const std::string &command );
     // specialized modifier seqeunce(s)
-    int cmd_SPELL   ( std::string level );
-    int cmd_HEALTH  ( std::string modifyBy );
+    int cmd_SPELL   ( std::list<std::string> &level );
+    int cmd_HEALTH  ( std::list<std::string> &modifyBy );
     // gerneral modifier seqeunces(s)
-    int cmd_MODSTAT ( std::string modifier );
-    int cmd_ADDSTAT ( std::string stat );
-    int cmd_RMVSTAT ( std::string stat );
+    int cmd_MODSTAT ( std::list<std::string> &modifier );
+    int cmd_ADDSTAT ( std::list<std::string> &stat );
+    int cmd_RMVSTAT ( const std::string &stat );
 
     // json load and store
-    int cmd_LOAD  ( std::string path );
-    int cmd_STORE ( std::string path );
+    int cmd_LOAD  ( const std::string &path );
+    int cmd_STORE ( const std::string &path );
 
 
     private:
     // helper function(s)
     int roll( int times, int modulus );
-    int doesKeyExist( std::string key );
+    int locateKey( std::string key );
     std::string upper( std::string input );
     // +<modifier> : increase by <modifier>
     // <modifier>  : set value to <modifier>
     // -<modifier> : substract by <modifier>
-    int modifyRule( std::string modifyBy );
+    int modifyRule( std::string key, std::string modifyBy );
 };
 
 #endif //__DNDSH_HPP__

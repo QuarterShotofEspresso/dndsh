@@ -49,6 +49,7 @@ class DnDsh {
     // <modifier>  : set value to <modifier>
     // -<modifier> : substract by <modifier>
     int modifyRule( std::string key, std::string modifyBy );
+    void printStat( std::string datum );
 };
 
 #endif //__DNDSH_HPP__

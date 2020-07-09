@@ -4,7 +4,7 @@
 DnDsh::DnDsh() {
     this->characterData = {
         "NAME.Tywin",
-        "STRENGTH.15:10",
+        "STRENGTH.15",
         "HEALTH.25:10",
         "DEXTERITY.10"
     };
@@ -76,7 +76,6 @@ int DnDsh::cmd_ROLL( std::string command ) {
         return 1;
     }
 
-
     int rollTimes = 0;
     int rollMod = 1;
 
@@ -97,22 +96,30 @@ int DnDsh::cmd_ROLL( std::string command ) {
 // Sample Usage:    stats [<key>]           //NOTE: [<key>] entered empty will print out every stat
 int DnDsh::cmd_STATS( const std::string &key ) {
 
-    std::string datum;
+    int returnStatus = 0;
 
-    for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
-        datum = this->characterData.at(i);
-        std::cout << BOLDWHITE << datum.substr(0, datum.find('.')) << RESET << CYAN << ":\t" << RESET;
-        if( datum.find(':') < datum.size() ) {
-            std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.find(':') - (datum.find('.') + 1)) << RESET 
-            << CYAN << "/" << BOLDRED << datum.substr(datum.find(':') + 1, datum.size()) << RESET;
-        } else {
-            std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.size()) << RESET;
+    if( key == "" ) {
+        std::cout << YELLOW << "   STATS" << RESET << std::endl;
+        for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
+            this->printStat(this->characterData.at(i)); 
+            std::cout << std::endl;
         }
-    
-        std::cout << std::endl;
     }
 
-    return 0;
+    else {
+        unsigned int locationOfKey = this->locateKey( key );
+        if ( locationOfKey < this->characterData.size() ) {
+            this->printStat( this->characterData.at( locationOfKey ) );
+            std::cout << std::endl;
+        }
+
+        else {
+            std::cout << BOLDRED << "error: " << RESET << RED << "Key not found" << RESET << std::endl;
+            returnStatus = 1;
+        }
+    }
+
+    return returnStatus;
 }
 
 
@@ -170,6 +177,8 @@ int DnDsh::cmd_HELP( const std::string &command ) {
     return returnStatus;
 
 }
+
+
 
 // Sample Usage:    spell <1-9> [<modifier>]        //NOTE: [<modifier>] is by default assumed as: -1
 //                  spell reset all
@@ -299,7 +308,7 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
 
     int locationOfKey = this->locateKey( key );
     std::string datum = this->characterData.at(locationOfKey);
-    int locationOfTempValue = datum.find(':');
+    unsigned int locationOfTempValue = datum.find(':');
     bool tempValueExists = ( locationOfTempValue < datum.size() );
     int maxValue = std::stoi(datum.substr(datum.find('.') + 1, datum.find(':')));
     std::string partDatum;
@@ -344,6 +353,24 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
     this->characterData.at(locationOfKey) = partDatum + ":" + std::to_string( newTempValue );        
 
     return returnStatus;
+}
+
+
+
+
+void DnDsh::printStat( std::string datum ) {
+    
+    std::cout << BOLDWHITE << datum.substr(0, datum.find('.')) << RESET << CYAN << ": " << RESET;
+
+    if( datum.find(':') < datum.size() ) {
+        std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.find(':') - (datum.find('.') + 1)) << RESET << CYAN << "/" << BOLDRED << datum.substr(datum.find(':') + 1, datum.size()) << RESET;
+    }
+
+    else {
+        std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.size()) << RESET;
+    }
+
+    return;
 }
 
 

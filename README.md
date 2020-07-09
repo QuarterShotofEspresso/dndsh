@@ -17,4 +17,4 @@ No, it will not restore your self-esteem--although you can always `mod charisma 
 what I mean. (Snooty laughter commences).
 What's that? You must leave!
 Your comrades await for you? Well, good luck sir! And SAFE TRAVELS! MAY
-<enter_diety_here> BE WITH YOU!
+`<enter_deity_here>` BE WITH YOU!

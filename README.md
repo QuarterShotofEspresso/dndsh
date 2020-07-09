@@ -2,7 +2,7 @@
 
 > Author: Ratnodeep Bandyopadhyay ([@QuarterShotofEspresso]())
 
-## Note: Sorry, the app is still under development
+## Note: The app is still under development
 
 Greetings weary traveler! Hmm... Let's take a look, shall we? You hands are creased,
 and hardened by calluses. Your eyes are parched and hair ruffled.

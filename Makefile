@@ -1,13 +1,13 @@
 all : bin/dndsh
 
-bin/dndsh : build/main.o build/dndsh.o
-	g++ -o bin/dndsh build/main.o build/dndsh.o -lreadline
+bin/dndsh : builds/main.o builds/dndsh.o
+	g++ -o bin/dndsh builds/main.o builds/dndsh.o -lreadline
 
-build/main.o : src/main.cpp
-	g++ -c -Wall -Iincludes -o build/main.o src/main.cpp
+builds/main.o : src/main.cpp
+	g++ -c -Wall -Iincludes -o builds/main.o src/main.cpp
 
-build/dndsh.o : src/dndsh.cpp
-	g++ -c -Wall -Iincludes -o build/dndsh.o src/dndsh.cpp
+builds/dndsh.o : src/dndsh.cpp
+	g++ -c -Wall -Iincludes -o builds/dndsh.o src/dndsh.cpp
 
 clean :
-	rm -rf build/* bin/*
+	rm -rf builds/* bin/*

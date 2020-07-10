@@ -31,15 +31,18 @@
                                     "\t\theatlh master <modifer>"
 
 
-#define DNDSH_MOD_CMD_HELP          ""
+#define DNDSH_MOD_CMD_HELP          "Sample Usage:\tmod <key> <new_value> [<new_temp_value>]\tNOTE: [<new_temp_value>] will by default leave everything unchanged"
 
-#define DNDSH_ADD_CMD_HELP          ""
+#define DNDSH_ADD_CMD_HELP          "Sample Usage:\tadd <new_key> <new_value> [<new_temp_value>]\tNOTE: [<new_temp_value>] will by deafult skip appending a new_temp_value to new_key"
 
-#define DNDSH_RM_CMD_HELP           ""
+#define DNDSH_RM_CMD_HELP           "Sample Usage:\trm  <key>"
 
-#define DNDSH_LD_CMD_HELP           ""
+#define DNDSH_LD_CMD_HELP           "Sample Usagae:\tld <file_path>"
 
-#define DNDSH_ST_CMD_HELP           ""
+#define DNDSH_ST_CMD_HELP           "Sample Usage:\tst <file_path>"
 
+#define DNDSH_MODIFIER_HELP         "+<modifier> : increase by <modifier>\n"\
+                                    "<modifier>  : set value to <modifier>\n"\
+                                    "-<modifier> : substract by <modifier>"
 
 #endif //__HELP_MESSAGES__

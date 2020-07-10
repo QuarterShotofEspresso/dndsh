@@ -10,6 +10,7 @@ DnDsh::DnDsh() {
     };
 }
 
+
 int DnDsh::cmd_REQ( std::string input ) {
    
     std::istringstream inputStream(input);
@@ -23,43 +24,32 @@ int DnDsh::cmd_REQ( std::string input ) {
     }
     commandTokens.push_back("");
 
+    std::string command = commandTokens.front();
+    commandTokens.pop_front();
+
     // command options
-    if( commandTokens.front() == "spell" ) {
-        commandTokens.pop_front();
+    if( command == "spell" ) {
         returnStatus = cmd_SPELL( commandTokens );
-    } else if( commandTokens.front() == "stats" ) {
-        commandTokens.pop_front();
+    } else if( command == "stats" ) {
         returnStatus = cmd_STATS( commandTokens.front() );
-    } else if( commandTokens.front() == "help" ) {
-        commandTokens.pop_front();
+    } else if( command == "help" ) {
         returnStatus = cmd_HELP( commandTokens.front() );
-    } else if( commandTokens.front() == "health" ) {
-        commandTokens.pop_front();
+    } else if( command == "health" ) {
         returnStatus = cmd_HEALTH( commandTokens );
-    } else if( commandTokens.front() == "mod" ) {
-        commandTokens.pop_front();
+    } else if( command == "mod" ) {
         returnStatus = cmd_MODSTAT( commandTokens );
-    } else if( commandTokens.front() == "add" ) {
-        commandTokens.pop_front();
+    } else if( command == "add" ) {
         returnStatus = cmd_ADDSTAT( commandTokens );
-    } else if( commandTokens.front() == "rm" ) {
-        commandTokens.pop_front();
+    } else if( command == "rm" ) {
         returnStatus = cmd_RMVSTAT( commandTokens.front() );
-    } else if( commandTokens.front() == "ld" ) {
-        commandTokens.pop_front();
+    } else if( command == "ld" ) {
         returnStatus = cmd_LOAD( commandTokens.front() );
-    } else if( commandTokens.front() == "st" ) {
-        commandTokens.pop_front();
+    } else if( command == "st" ) {
         returnStatus = cmd_STORE( commandTokens.front() );
-    } else if( input.find('d') < input.size() ) {
-        returnStatus = cmd_ROLL( input );
-    } else if( commandTokens.front() == "exit") {
+    } else if( command == "exit") {
         returnStatus = -1;
-    } else if( input == "" ) {
-        returnStatus = 0;
     } else {
-        std::cout << BOLDRED << "error: " << RESET << RED << "Unknown Command" << RESET << std::endl;
-        returnStatus = 1;
+        returnStatus = cmd_ROLL( input );
     }
 
     commandTokens.clear();
@@ -71,25 +61,40 @@ int DnDsh::cmd_REQ( std::string input ) {
 
 int DnDsh::cmd_ROLL( std::string command ) {
 
-    if( command.length() == 1 ) {
-        std::cout << BOLDRED << "error: " << RESET << RED << "Incorrect Command Usage: " << RESET << CYAN << " <total_rolls>d<dice_type>" << RESET << std::endl;
-        return 1;
+    int returnStatus = 0;
+
+    if( (command.find('d') < command.size()) || (command.size() == 0) ) {
+
+        int locationOfd = command.find('d');
+
+        for( int i = 0; i < locationOfd; i++ ) {
+            if( !isdigit(command.at(i)) ) {
+                std::cout << this->format_err( "uknown command" );
+                return 1;
+            }
+        }
+
+        for( unsigned int i = (locationOfd + 1); i < command.size(); i++ ) {
+            if( !isdigit(command.at(i)) ) {
+                std::cout << this->format_err( "unknown command" );
+                return 1;
+            }
+        }
+                
+        int rollTimes = 0;
+        int rollMod = 1;
+
+        rollTimes = (command.find('d') == 0) ? 1 : stoi(command.substr(0, command.find('d')));
+        rollMod = stoi(command.substr(command.find('d') + 1, command.length()));
+
+        std::cout << CYAN << "rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
     }
 
-    int rollTimes = 0;
-    int rollMod = 1;
-
-    if (command.find('d') == 0) {
-        rollTimes = 1;
-    } else {
-        rollTimes = stoi(command.substr(0, command.find('d')));
+    else {
+        std::cout << this->format_err( "unknown command" );
     }
-    
-    rollMod = stoi(command.substr(command.find('d') + 1, command.length()));
-    std::cout << CYAN << "Rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
-    
-    
-    return 0;
+ 
+    return returnStatus;
 }
 
 
@@ -99,7 +104,7 @@ int DnDsh::cmd_STATS( const std::string &key ) {
     int returnStatus = 0;
 
     if( key == "" ) {
-        std::cout << YELLOW << "   STATS" << RESET << std::endl;
+        std::cout << YELLOW << "   stats" << RESET << std::endl;
         for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
             this->printStat(this->characterData.at(i)); 
             std::cout << std::endl;
@@ -114,7 +119,7 @@ int DnDsh::cmd_STATS( const std::string &key ) {
         }
 
         else {
-            std::cout << BOLDRED << "error: " << RESET << RED << "Key not found" << RESET << std::endl;
+            std::cout << this->format_err( "stat not found" ); 
             returnStatus = 1;
         }
     }
@@ -131,51 +136,30 @@ int DnDsh::cmd_HELP( const std::string &command ) {
 
     if( command == "" ) {
         std::cout << DNDSH_COMMAND_HELP_LIST << std::endl;
-    }
-
-    else if( command == "roll" ) {
+    } else if( command == "roll" ) {
         std::cout << DNDSH_ROLL_CMD_HELP << std::endl;
-    }
-    
-    else if( command == "stats" ) {
+    } else if( command == "stats" ) {
         std::cout << DNDSH_STATS_CMD_HELP << std::endl;
-    }
-
-    else if( command == "spell" ) {
+    } else if( command == "spell" ) {
         std::cout << DNDSH_SPELL_CMD_HELP << std::endl;
-    }
-
-    else if( command == "health" ) {
+    } else if( command == "health" ) {
         std::cout << DNDSH_HEALTH_CMD_HELP << std::endl;
-    }
-
-    else if( command == "mod" ) {
+    } else if( command == "mod" ) {
         std::cout << DNDSH_MOD_CMD_HELP << std::endl;
-    }
-
-    else if( command == "add" ) {
+    } else if( command == "add" ) {
         std::cout << DNDSH_ADD_CMD_HELP << std::endl;
-    }
-
-    else if( command == "rm" ) {
+    } else if( command == "rm" ) {
         std::cout << DNDSH_RM_CMD_HELP << std::endl;
-    }
-
-    else if( command == "ld" ) {
+    } else if( command == "ld" ) {
         std::cout << DNDSH_LD_CMD_HELP << std::endl;
-    }
-    
-    else if( command == "st" ) {
+    } else if( command == "st" ) {
         std::cout << DNDSH_ST_CMD_HELP << std::endl;
-    }
-
-    else {
-        std::cout << BOLDRED << "error: " << RESET << RED << "Unknown command type \'help\' for a list of commands" << std::endl;
+    } else {
+        std::cout << this->format_err( "unknown command: type \'help\' for a list of commands" );
         returnStatus = 1;
     }
 
     return returnStatus;
-
 }
 
 
@@ -206,8 +190,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
     } 
 
     else if( modifyBy.front() == "" ) {
-        std::cout << BOLDRED << "error: " << RESET << RED << "Incorrect Usage: "
-        "Type \'help health\' to learn more" << RESET << std::endl;
+        std::cout << this->format_err( "incorrect useage: type \'help health\' to learn more" );
         returnStatus = 1;
     }
 
@@ -283,9 +266,7 @@ int DnDsh::locateKey( std::string key ) {
     std::string capKey = this->upper( key );
 
     for( int i = 0; i < this->characterData.size(); i++ ) {
-        if( this->characterData.at(i).substr(0, characterData.at(i).find('.')) == capKey ) {
-            return i;
-        }
+        if( this->characterData.at(i).substr(0, characterData.at(i).find('.')) == capKey ) return i;
     }
 
     return -1;
@@ -340,7 +321,7 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
     }
 
     else {
-        std::cout << BOLDRED << "error: " << RESET << RED << "modifier unknown" << RESET << std::endl;
+        std::cout << this->format_err( "unknown modifer" );
         returnStatus = 1;
     }    
 
@@ -373,6 +354,18 @@ void DnDsh::printStat( std::string datum ) {
     return;
 }
 
+
+
+std::string DnDsh::format_err( std::string message ) {
+
+    std::ostringstream formatStream;
+    std::string formattedString;
+
+    formatStream << BOLDRED << "error: " << RESET << RED << message << RESET << std::endl;
+    formattedString = formatStream.str();
+
+    return formattedString;
+}
 
 
 

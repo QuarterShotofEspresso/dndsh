@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "Install dependency: libreadline-dev"
 sudo apt-get install libreadline-dev
 
 mkdir bin builds

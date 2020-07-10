@@ -50,6 +50,10 @@ class DnDsh {
     // -<modifier> : substract by <modifier>
     int modifyRule( std::string key, std::string modifyBy );
     void printStat( std::string datum );
+    std::string format_err( std::string message );
 };
+
+
+constexpr unsigned int dndsh_hash( const char input[] );
 
 #endif //__DNDSH_HPP__

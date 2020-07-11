@@ -9,8 +9,8 @@
 #include "linux_color_schemes.hpp"
 #include <sstream>
 
-// data stored as {<attribute tag>.<attribute value/max>:<attribute temporary/current>}
-// data stored as {"STRENGTH.5", "Health.25:16", "nAmE.Tywin"}
+// data stored as {<stat_key>.<primary_value>[:<secondary_value>]}
+// data stored as {"STRENGTH.5", "HEALTH.25:16", "NAME.Tywin", "SAVING:~/dnd/tywin.sd"}
 class DnDsh {
 
     private:
@@ -32,7 +32,7 @@ class DnDsh {
     int cmd_HEALTH  ( std::list<std::string> &modifyBy );
     // gerneral modifier seqeunces(s)
     int cmd_MODSTAT ( std::list<std::string> &modifier );
-    int cmd_ADDSTAT ( std::list<std::string> &stat );
+    int cmd_ADDSTAT ( std::list<std::string> &addEntry );
     int cmd_RMVSTAT ( const std::string &stat );
 
     // json load and store

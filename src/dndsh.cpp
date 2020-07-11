@@ -64,20 +64,25 @@ int DnDsh::cmd_REQ( std::string input ) {
 
 int DnDsh::cmd_ROLL( std::string command ) {
 
-    if( (command.find('d') < command.size()) || (command.size() == 0) ) {
+    if( command == "d" ) {
+        std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
+        return 1;
+    }
+    
+    else if( command.find('d') < command.size() ) {
 
         int locationOfd = command.find('d');
 
         for( int i = 0; i < locationOfd; i++ ) {
             if( !isdigit(command.at(i)) ) {
-                std::cout << this->format_err( "uknown command" );
+                std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
                 return 1;
             }
         }
 
         for( unsigned int i = (locationOfd + 1); i < command.size(); i++ ) {
             if( !isdigit(command.at(i)) ) {
-                std::cout << this->format_err( "unknown command" );
+                std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
                 return 1;
             }
         }
@@ -300,9 +305,33 @@ int DnDsh::cmd_MODSTAT( std::list<std::string> &modifier ) {
 
 
 
-// Sample Usage:    add <new_key> <new_value> [<new_temp_value>]    //NOTE: [<new_temp_value>] will by deafult skip appending a new_temp_value to new_key
-int DnDsh::cmd_ADDSTAT( std::list<std::string> &stat ) {
-    std::cout << "Need to implement ADDSTAT" << std::endl;
+// Sample Usage:    add <new_stat> <new_value> [<new_temp_value>]    //NOTE: [<new_temp_value>] will by deafult skip appending a new_temp_value to new_key
+int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
+
+    if( addEntry.front() == "" ) {
+        std::cout << this->format_err( "incorrect usage: missing <new_stat>. Type \'help add \' to learn more" );
+        return 1;
+    }
+
+    std::string newStat = this->upper(addEntry.front());
+    addEntry.pop_front();
+
+    if( addEntry.front() == "" ) {
+        std::cout << this->format_err( "incorrect usage: missing <new_primary_value>. Type \'help add \' to learn more" );
+        return 1;
+    }
+    
+    newStat += "." + addEntry.front();
+    addEntry.pop_front();
+
+    if( addEntry.front() != "" ) {    
+        newStat += ":" + addEntry.front();
+    }
+
+    std::cout << "Added: " << newStat << std::endl;
+
+    this->characterData.push_back( newStat );
+
     return 0;
 }
 

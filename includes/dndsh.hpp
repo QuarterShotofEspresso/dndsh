@@ -48,7 +48,8 @@ class DnDsh {
     // +<modifier> : increase by <modifier>
     // <modifier>  : set value to <modifier>
     // -<modifier> : substract by <modifier>
-    int modifyRule( std::string key, std::string modifyBy );
+    // reset       : set <temp_value> to <master_value>
+    int modifyRule( std::string key, std::string modifyBy, bool master );
     void printStat( std::string datum );
     std::string format_err( std::string message );
 };

@@ -5,7 +5,7 @@ DnDsh::DnDsh() {
     this->characterData = {
         "NAME.Tywin",
         "STRENGTH.15",
-        "HEALTH.25:10",
+        "HEALTH.25:6",
         "DEXTERITY.10"
     };
 }
@@ -28,23 +28,23 @@ int DnDsh::cmd_REQ( std::string input ) {
     commandTokens.pop_front();
 
     // command options
-    if( command == "spell" ) {
+    if( command == "spell" || command == "sp" ) {
         returnStatus = cmd_SPELL( commandTokens );
-    } else if( command == "stats" ) {
+    } else if( command == "stat" || command == "sa" ) {
         returnStatus = cmd_STATS( commandTokens.front() );
     } else if( command == "help" ) {
         returnStatus = cmd_HELP( commandTokens.front() );
-    } else if( command == "health" ) {
+    } else if( command == "health" || command == "hp" ) {
         returnStatus = cmd_HEALTH( commandTokens );
     } else if( command == "mod" ) {
         returnStatus = cmd_MODSTAT( commandTokens );
     } else if( command == "add" ) {
         returnStatus = cmd_ADDSTAT( commandTokens );
-    } else if( command == "rm" ) {
+    } else if( command == "remove" || command == "rm" ) {
         returnStatus = cmd_RMVSTAT( commandTokens.front() );
-    } else if( command == "ld" ) {
+    } else if( command == "load" || command == "ld" ) {
         returnStatus = cmd_LOAD( commandTokens.front() );
-    } else if( command == "st" ) {
+    } else if( command == "store" || command == "st" ) {
         returnStatus = cmd_STORE( commandTokens.front() );
     } else if( command == "exit") {
         returnStatus = -1;
@@ -91,20 +91,19 @@ int DnDsh::cmd_ROLL( std::string command ) {
     }
 
     else {
-        std::cout << this->format_err( "unknown command" );
+        std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
     }
  
     return returnStatus;
 }
 
 
-// Sample Usage:    stats [<key>]           //NOTE: [<key>] entered empty will print out every stat
+// Sample Usage:    stat [<key>]           //NOTE: [<key>] entered empty will print out every stat
 int DnDsh::cmd_STATS( const std::string &key ) {
 
     int returnStatus = 0;
 
     if( key == "" ) {
-        std::cout << YELLOW << "   stats" << RESET << std::endl;
         for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
             this->printStat(this->characterData.at(i)); 
             std::cout << std::endl;
@@ -119,7 +118,7 @@ int DnDsh::cmd_STATS( const std::string &key ) {
         }
 
         else {
-            std::cout << this->format_err( "stat not found" ); 
+            std::cout << this->format_err( "stat: stat not found" ); 
             returnStatus = 1;
         }
     }
@@ -138,21 +137,21 @@ int DnDsh::cmd_HELP( const std::string &command ) {
         std::cout << DNDSH_COMMAND_HELP_LIST << std::endl;
     } else if( command == "roll" ) {
         std::cout << DNDSH_ROLL_CMD_HELP << std::endl;
-    } else if( command == "stats" ) {
+    } else if( command == "stats" || command == "sa" ) {
         std::cout << DNDSH_STATS_CMD_HELP << std::endl;
-    } else if( command == "spell" ) {
+    } else if( command == "spell" || command == "sp" ) {
         std::cout << DNDSH_SPELL_CMD_HELP << std::endl;
-    } else if( command == "health" ) {
+    } else if( command == "health" || command == "hp" ) {
         std::cout << DNDSH_HEALTH_CMD_HELP << std::endl;
     } else if( command == "mod" ) {
         std::cout << DNDSH_MOD_CMD_HELP << std::endl;
     } else if( command == "add" ) {
         std::cout << DNDSH_ADD_CMD_HELP << std::endl;
-    } else if( command == "rm" ) {
+    } else if( command == "remove" || command == "rm" ) {
         std::cout << DNDSH_RM_CMD_HELP << std::endl;
-    } else if( command == "ld" ) {
+    } else if( command == "load" || command == "ld" ) {
         std::cout << DNDSH_LD_CMD_HELP << std::endl;
-    } else if( command == "st" ) {
+    } else if( command == "store" || command == "st" ) {
         std::cout << DNDSH_ST_CMD_HELP << std::endl;
     } else {
         std::cout << this->format_err( "unknown command: type \'help\' for a list of commands" );
@@ -164,10 +163,9 @@ int DnDsh::cmd_HELP( const std::string &command ) {
 
 
 
-// Sample Usage:    spell <1-9> [<modifier>]        //NOTE: [<modifier>] is by default assumed as: -1
-//                  spell reset all
-//                  spell reset <1-9>
-//                  spell master <1-9> <modifier>
+// Sample Usage:    spell {<spell_level>|all} [<modifier>]        //NOTE: [<modifier>] is by default assumed as: -1
+//                  spell reset [<spell_level>]
+//                  spell master <spell_level> <modifier>
 int DnDsh::cmd_SPELL( std::list<std::string> &level ) {
     std::cout << "Need to implement SPELL" << std::endl;
     return 0;
@@ -196,11 +194,11 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
 
     else if( modifyBy.front() == "master" ) {
         modifyBy.pop_front();
-        returnStatus = this->modifyRule( "HEALTH", modifyBy.front() );
+        returnStatus = this->modifyRule( "HEALTH", modifyBy.front(), true );
     }
 
     else {
-        returnStatus = this->modifyRule( "HEALTH", modifyBy.front() );
+        returnStatus = this->modifyRule( "HEALTH", modifyBy.front(), false );
     }
 
     return returnStatus;
@@ -283,7 +281,7 @@ std::string DnDsh::upper( std::string input ) {
 }
 
 
-int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
+int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
 
     int returnStatus = 0;
 
@@ -291,47 +289,67 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
     std::string datum = this->characterData.at(locationOfKey);
     unsigned int locationOfTempValue = datum.find(':');
     bool tempValueExists = ( locationOfTempValue < datum.size() );
-    int maxValue = std::stoi(datum.substr(datum.find('.') + 1, datum.find(':')));
-    std::string partDatum;
-    int newTempValue;
+    int masterValue;
+    int tempValue;
+    int *value = nullptr;
 
+    // initialize tempValue and masterValue from available temp else master
     if( tempValueExists ) {
-        partDatum = datum.substr(0, locationOfTempValue);
-        newTempValue = std::stoi(datum.substr(datum.find(':') + 1, datum.size()));
+        masterValue = std::stoi(datum.substr(datum.find('.') + 1, datum.find(':') - datum.find('.') - 1));
+        tempValue = std::stoi(datum.substr(datum.find(':') + 1, datum.size() - datum.find(':') - 1));
     } else {
-        partDatum = datum.substr(0, datum.size());
-        newTempValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size()));
+        masterValue = tempValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1));
     }
 
+    if( master ){
+        value = &masterValue;
+    } else {
+        value = &tempValue;
+    }
 
-    if( (modifyBy.at(0) == '+') && tempValueExists ) {
-        newTempValue += std::stoi(modifyBy.substr(1, modifyBy.size())); 
+    // begin manipulation of data
+    // manipulate data by modifier and update tempValue
+    if( modifyBy.at(0) == '+' ) {
+        *value += std::stoi(modifyBy.substr(1, modifyBy.size() - 1));
     }
 
     else if( modifyBy.at(0) == '-' ) {
-        newTempValue -= std::stoi(modifyBy.substr(1, modifyBy.size()));
-    }
-
-    else if( isdigit(modifyBy.at(0)) ) {
-        newTempValue = std::stoi(modifyBy);
+        *value -= std::stoi(modifyBy.substr(1, modifyBy.size() - 1));
     }
 
     else if( modifyBy == "reset" ) {
-        newTempValue = std::stoi(partDatum.substr(partDatum.find('.') + 1, partDatum.size()));
+        if( master ){
+            std::cout << this->format_err("modifier rule: cannot reset master value");
+            return 1;
+        } else {
+            tempValue = masterValue;
+        }
     }
 
     else {
-        std::cout << this->format_err( "unknown modifer" );
-        returnStatus = 1;
-    }    
+        for( char i : modifyBy ) {
+            if( !isdigit(i) ) {
+                std::cout << this->format_err( "modifier rule: unknown modifer" );
+                return 1;
+            }
+        }
 
-    if( newTempValue < 0 ) { 
-        newTempValue = 0;
-    } else if( newTempValue > maxValue ) {
-        newTempValue = maxValue;
+        *value = std::stoi(modifyBy);
     }
 
-    this->characterData.at(locationOfKey) = partDatum + ":" + std::to_string( newTempValue );        
+
+    // adjust temp value and max value to respected bounds
+    if( tempValue < 0 ) { 
+        tempValue = 0;
+    } else if( tempValue > masterValue ) {
+        tempValue = masterValue;
+    }
+
+    if( masterValue < 0 ) {
+        masterValue = 0;
+    }
+
+    this->characterData.at(locationOfKey) = this->upper(key) + "." + std::to_string(masterValue) + ":" + std::to_string( tempValue );        
 
     return returnStatus;
 }
@@ -340,15 +358,28 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy ) {
 
 
 void DnDsh::printStat( std::string datum ) {
-    
-    std::cout << BOLDWHITE << datum.substr(0, datum.find('.')) << RESET << CYAN << ": " << RESET;
 
-    if( datum.find(':') < datum.size() ) {
-        std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.find(':') - (datum.find('.') + 1)) << RESET << CYAN << "/" << BOLDRED << datum.substr(datum.find(':') + 1, datum.size()) << RESET;
+    unsigned int locationOfTempValue = datum.find(':');
+    bool tempValueExists = ( locationOfTempValue < datum.size() );
+
+    std::string stat = datum.substr(0, datum.find('.'));
+    std::string masterValue;
+    std::string tempValue;
+    
+    if( tempValueExists ) {
+        masterValue = datum.substr(datum.find('.') + 1, locationOfTempValue - datum.find('.') - 1);
+        tempValue = datum.substr(locationOfTempValue + 1, datum.size() - locationOfTempValue);
+    } else {
+        masterValue = datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1);
+        tempValue = "";
     }
 
-    else {
-        std::cout << BOLDWHITE << datum.substr(datum.find('.') + 1, datum.size()) << RESET;
+    std::cout << BOLDWHITE << stat << RESET << CYAN << ": " << RESET;
+
+    if( tempValueExists ) {
+        std::cout << BOLDRED << tempValue << RESET << CYAN << "/" << BOLDWHITE << masterValue << RESET;
+    } else {
+        std::cout << BOLDWHITE << masterValue << RESET;
     }
 
     return;

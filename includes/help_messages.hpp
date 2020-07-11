@@ -30,7 +30,7 @@
 
 #define DNDSH_SPELL_CMD_HELP        "Sample Usage:\tsp {<spell_level>|all} [<modifier>]\n"\
                                     "\t\tsp reset [<spell_level>]\n"\
-                                    "\t\tsp master <spell_level> <modifier>\n"\
+                                    "\t\tsp master {<spell_level>|all} <modifier>\n"\
                                     "Description:\n"\
                                     "Spell will adjust <temporary_value> of <spell_level> according to <modifier>.\n"\
                                     "If <temporary_value> does not exist, spell will create one and adjust it according\n"\

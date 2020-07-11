@@ -6,7 +6,10 @@ DnDsh::DnDsh() {
         "NAME.Tywin",
         "STRENGTH.15",
         "HEALTH.25:6",
-        "DEXTERITY.10"
+        "DEXTERITY.10",
+        "SS1.5",
+        "SS2.10",
+        "SS3.4"
     };
 }
 
@@ -61,8 +64,6 @@ int DnDsh::cmd_REQ( std::string input ) {
 
 int DnDsh::cmd_ROLL( std::string command ) {
 
-    int returnStatus = 0;
-
     if( (command.find('d') < command.size()) || (command.size() == 0) ) {
 
         int locationOfd = command.find('d');
@@ -90,18 +91,21 @@ int DnDsh::cmd_ROLL( std::string command ) {
         std::cout << CYAN << "rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
     }
 
-    else {
+    else if( command.size() == 0 ) {
+        return 0;
+    }
+
+   else {
         std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
+        return 1;
     }
  
-    return returnStatus;
+    return 0;
 }
 
 
 // Sample Usage:    stat [<key>]           //NOTE: [<key>] entered empty will print out every stat
 int DnDsh::cmd_STATS( const std::string &key ) {
-
-    int returnStatus = 0;
 
     if( key == "" ) {
         for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
@@ -119,11 +123,11 @@ int DnDsh::cmd_STATS( const std::string &key ) {
 
         else {
             std::cout << this->format_err( "stat: stat not found" ); 
-            returnStatus = 1;
+            return 1;
         }
     }
 
-    return returnStatus;
+    return 0;
 }
 
 
@@ -131,8 +135,6 @@ int DnDsh::cmd_STATS( const std::string &key ) {
 // Sample Usage:    help [<command>]    //NOTE: absent [<command>] prints all available commands
 int DnDsh::cmd_HELP( const std::string &command ) {
     
-    int returnStatus = 0;
-
     if( command == "" ) {
         std::cout << DNDSH_COMMAND_HELP_LIST << std::endl;
     } else if( command == "roll" ) {
@@ -155,19 +157,105 @@ int DnDsh::cmd_HELP( const std::string &command ) {
         std::cout << DNDSH_ST_CMD_HELP << std::endl;
     } else {
         std::cout << this->format_err( "unknown command: type \'help\' for a list of commands" );
-        returnStatus = 1;
+        return 1;
     }
 
-    return returnStatus;
+    return 0;
 }
 
 
 
 // Sample Usage:    spell {<spell_level>|all} [<modifier>]        //NOTE: [<modifier>] is by default assumed as: -1
-//                  spell reset [<spell_level>]
-//                  spell master <spell_level> <modifier>
-int DnDsh::cmd_SPELL( std::list<std::string> &level ) {
-    std::cout << "Need to implement SPELL" << std::endl;
+//                  spell reset [<spell_level>]                   //NOTE: [<spell_level>] is by default 'all'
+//                  spell master {<spell_level>|all} <modifier>
+int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
+
+    if( spellEntry.front() == "" ) {
+        std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more." );
+        return 1;
+    }
+
+
+    int returnStatus = 0;
+   
+    bool master = false;
+    int locationOfKey;
+    std::string level = spellEntry.front();
+    spellEntry.pop_front();
+
+    if( level == "master" ) {
+        master = true;
+        level = spellEntry.front();
+        spellEntry.pop_front();
+    }
+
+
+    if( isdigit(level.at(0)) ) {
+        
+        level = "SS" + level;
+        locationOfKey = this->locateKey( level );
+
+        if( locationOfKey < 0 ) {
+            this->format_err( "key not found: \'" + level + "\' does not exist. Add key using \'add\' command." );
+            return 1;
+        }
+
+        else {
+            return this->modifyRule( level, spellEntry.front(), master );
+        }
+    }
+
+    else if( level == "all" ) {
+        for( int i = 1; i < 10; i++ ) {
+            locationOfKey = this->locateKey( "SS" + std::to_string(i) );
+            if ( locationOfKey < 0 ) {
+                std::cout << "spell slot " << i << " does not exist. stopping..." << std::endl;
+                return 0;
+            } else {
+                returnStatus = this->modifyRule( "SS" + std::to_string(i), spellEntry.front(), master );
+                if( returnStatus ) return 1;
+            }
+        }
+    }
+
+    else if( level == "reset" ) {
+        if( spellEntry.front() == "" ) {
+            for( int i = 1; i < 10; i++ ) {
+                locationOfKey = this->locateKey( "SS" + std::to_string(i) );
+                if ( locationOfKey < 0 ) {
+                    std::cout << "spell slot " << i << " does not exist. stopping..." << std::endl;
+                    return 0;
+                }
+                else {
+                    returnStatus = this->modifyRule( "SS" + std::to_string(i), "reset", master );
+                    if( returnStatus ) return 1;
+                }
+            }
+        }
+
+        else if( isdigit(spellEntry.front().at(0)) ) {
+            level = "SS" + spellEntry.front();
+            locationOfKey = this->locateKey( level );
+            if( locationOfKey < 0 ){
+                std::cout << this->format_err( "key not found: \'" + level + "\' does not exist. Add key using \'add\' command." );
+                return 1;
+            }
+
+            else {
+                return this->modifyRule( level, "reset", master );
+            }
+        }
+
+        else {
+            std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more" );
+            return 1;
+        }
+    }
+
+    else {
+        std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more" );
+    }
+
     return 0;
 }
 
@@ -179,17 +267,15 @@ int DnDsh::cmd_SPELL( std::list<std::string> &level ) {
 int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
    
     int returnStatus = 0;
-
+    
     if( this->locateKey( "HEALTH" ) < 0 ) {
-        std::cout << CYAN << "Key: " << BOLDWHITE << "HEALTH" << RESET << CYAN 
-        << " does not exist." << std::endl 
-        << "Please add the key using the \'add\' command" << RESET << std::endl;
-        returnStatus = 1;
+        std::cout << this->format_err( "key not found: \'HEALTH\' does not exist. Add key using \'add\' command." );
+        return 1;
     } 
 
     else if( modifyBy.front() == "" ) {
-        std::cout << this->format_err( "incorrect useage: type \'help health\' to learn more" );
-        returnStatus = 1;
+        std::cout << this->format_err( "incorrect usage: type \'help health\' to learn more" );
+        return 1;
     }
 
     else if( modifyBy.front() == "master" ) {

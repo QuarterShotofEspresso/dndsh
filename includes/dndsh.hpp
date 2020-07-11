@@ -28,7 +28,7 @@ class DnDsh {
     int cmd_STATS   ( const std::string &key );
     int cmd_HELP    ( const std::string &command );
     // specialized modifier seqeunce(s)
-    int cmd_SPELL   ( std::list<std::string> &level );
+    int cmd_SPELL   ( std::list<std::string> &spellEntry );
     int cmd_HEALTH  ( std::list<std::string> &modifyBy );
     // gerneral modifier seqeunces(s)
     int cmd_MODSTAT ( std::list<std::string> &modifier );

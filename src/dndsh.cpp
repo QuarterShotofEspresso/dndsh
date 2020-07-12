@@ -33,7 +33,7 @@ int DnDsh::cmd_REQ( std::string input ) {
     // command options
     if( command == "spell" || command == "sp" ) {
         returnStatus = cmd_SPELL( commandTokens );
-    } else if( command == "stat" || command == "sa" ) {
+    } else if( command == "ls" || command == "l" ) {
         returnStatus = cmd_STATS( commandTokens.front() );
     } else if( command == "help" ) {
         returnStatus = cmd_HELP( commandTokens.front() );
@@ -86,7 +86,7 @@ int DnDsh::cmd_ROLL( std::string command ) {
                 return 1;
             }
         }
-                
+
         int rollTimes = 0;
         int rollMod = 1;
 
@@ -127,7 +127,7 @@ int DnDsh::cmd_STATS( const std::string &key ) {
         }
 
         else {
-            std::cout << this->format_err( "stat: stat not found" ); 
+            std::cout << this->format_err( "stat: stat not found. Type \'ls\' for a list of stats" ); 
             return 1;
         }
     }
@@ -144,7 +144,7 @@ int DnDsh::cmd_HELP( const std::string &command ) {
         std::cout << DNDSH_COMMAND_HELP_LIST << std::endl;
     } else if( command == "roll" ) {
         std::cout << DNDSH_ROLL_CMD_HELP << std::endl;
-    } else if( command == "stats" || command == "sa" ) {
+    } else if( command == "ls" || command == "l" ) {
         std::cout << DNDSH_STATS_CMD_HELP << std::endl;
     } else if( command == "spell" || command == "sp" ) {
         std::cout << DNDSH_SPELL_CMD_HELP << std::endl;
@@ -297,19 +297,53 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
 
 
 
-// Sample Usage:    mod <key> <new_value> [<new_temp_value>]    //NOTE: [<new_temp_value>] will by default leave everything unchanged
-int DnDsh::cmd_MODSTAT( std::list<std::string> &modifier ) {
-    std::cout << "Need to implement MODSTAT" << std::endl;
+// Sample Usage:    mod <stat> <primary_value> [<secondary_value>]    //NOTE: [<secondary_value>] will by default delete <secondary_value> if it exists
+int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
+
+    if( modEntry.front() == "" ) {
+        std::cout << this->format_err( "incorrect usage: missing <stat>. Type \'help mod\' to learn more" );
+        return 1;
+    }
+
+    std::string stat = this->upper( modEntry.front() );
+    modEntry.pop_front();
+
+    int locationOfKey = this->locateKey( stat );
+    if( locationOfKey < 0 ) {
+        std::cout << this->format_err( "stat not found: type \'ls\' for a list of available stats" );
+        return 1;
+    }
+
+    if( modEntry.front() == "" ) {
+        std::cout << this->format_err( "incorrect usage: missing <new_value>. Type \'help mod\' to learn more" );
+        return 1;
+    }
+
+    // load primary_value
+    stat += '.' + modEntry.front();
+    modEntry.pop_front();
+
+    std::string secondaryValue = modEntry.front();
+    modEntry.pop_front();
+
+    // check for <secondary_value>
+    if( secondaryValue != "" ) {
+        stat += ":" + secondaryValue;
+    }
+    
+    // load secondaryValue
+    this->characterData.at( locationOfKey ) = stat;
+
     return 0;
 }
 
 
 
-// Sample Usage:    add <new_stat> <new_value> [<new_temp_value>]    //NOTE: [<new_temp_value>] will by deafult skip appending a new_temp_value to new_key
+// Sample Usage:    add <new_stat> <new_value> [<new_ancillary_value>]    //NOTE: [<new_ancillary_value>] will by deafult skip appending a new_ancillary_value to new_key
 int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 
     if( addEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_stat>. Type \'help add \' to learn more" );
+        std::cout << this->format_err( "incorrect usage: missing <new_stat>. Type \'help add\' to learn more" );
         return 1;
     }
 
@@ -317,7 +351,7 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
     addEntry.pop_front();
 
     if( addEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_primary_value>. Type \'help add \' to learn more" );
+        std::cout << this->format_err( "incorrect usage: missing <new_primary_value>. Type \'help add\' to learn more" );
         return 1;
     }
     
@@ -339,7 +373,24 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 
 // Sample Usage:    rm  <key>
 int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
-    std::cout << "Need to implement RMVSTAT" << std::endl;
+    
+    if( stat == "" ) {
+        std::cout << this->format_err( "incorrect usage: type \'help remove\' to learn more" );
+        return 1;
+    }
+
+    else {
+        int locationOfKey = this->locateKey( stat );
+        if ( locationOfKey < 0 ) {
+            std::cout << this->format_err( "stat not found: type \'ls\' for a list of available stats" );
+            return 1;
+        }
+
+        else {
+            this->characterData.erase( characterData.begin() + locationOfKey );
+        }
+    }
+
     return 0;
 }
 
@@ -389,7 +440,7 @@ int DnDsh::locateKey( std::string key ) {
 std::string DnDsh::upper( std::string input ) {
     
     for( unsigned int i = 0; i < input.size(); i++ ) {
-        input.at(i) = toupper( input.at(i) );
+        if(isalpha( input.at(i) )) input.at(i) = toupper( input.at(i) );
     }
 
     return input;
@@ -403,42 +454,38 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
     int locationOfKey = this->locateKey( key );
     std::string datum = this->characterData.at(locationOfKey);
     unsigned int locationOfTempValue = datum.find(':');
-    bool tempValueExists = ( locationOfTempValue < datum.size() );
+    bool ancillaryValueExists = ( locationOfTempValue < datum.size() );
     int masterValue;
-    int tempValue;
-    int *value = nullptr;
+    int ancillaryValue;
 
-    // initialize tempValue and masterValue from available temp else master
-    if( tempValueExists ) {
+    // initialize ancillaryValue and masterValue from available ancillary else master
+    if( ancillaryValueExists ) {
         masterValue = std::stoi(datum.substr(datum.find('.') + 1, datum.find(':') - datum.find('.') - 1));
-        tempValue = std::stoi(datum.substr(datum.find(':') + 1, datum.size() - datum.find(':') - 1));
+        ancillaryValue = std::stoi(datum.substr(datum.find(':') + 1, datum.size() - datum.find(':') - 1));
     } else {
-        masterValue = tempValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1));
+        masterValue = ancillaryValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1));
     }
 
-    if( master ){
-        value = &masterValue;
-    } else {
-        value = &tempValue;
-    }
+    
+    int &valueToAdjust = ( master ) ? masterValue : ancillaryValue;
 
     // begin manipulation of data
-    // manipulate data by modifier and update tempValue
+    // manipulate data by modifier and update ancillaryValue
     if( modifyBy.at(0) == '+' ) {
-        *value += std::stoi(modifyBy.substr(1, modifyBy.size() - 1));
+        valueToAdjust += std::stoi(modifyBy.substr(1, modifyBy.size() - 1));
     }
 
     else if( modifyBy.at(0) == '-' ) {
-        *value -= std::stoi(modifyBy.substr(1, modifyBy.size() - 1));
+        valueToAdjust -= std::stoi(modifyBy.substr(1, modifyBy.size() - 1));
     }
 
     else if( modifyBy == "reset" ) {
         if( master ){
             std::cout << this->format_err("modifier rule: cannot reset master value");
             return 1;
-        } else {
-            tempValue = masterValue;
         }
+
+        ancillaryValue = masterValue;
     }
 
     else {
@@ -449,22 +496,22 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
             }
         }
 
-        *value = std::stoi(modifyBy);
+        valueToAdjust = std::stoi(modifyBy);
     }
 
 
-    // adjust temp value and max value to respected bounds
-    if( tempValue < 0 ) { 
-        tempValue = 0;
-    } else if( tempValue > masterValue ) {
-        tempValue = masterValue;
+    // adjust ancillary value and max value to respected bounds
+    if( ancillaryValue < 0 ) { 
+        ancillaryValue = 0;
+    } else if( ancillaryValue > masterValue ) {
+        ancillaryValue = masterValue;
     }
 
     if( masterValue < 0 ) {
         masterValue = 0;
     }
 
-    this->characterData.at(locationOfKey) = this->upper(key) + "." + std::to_string(masterValue) + ":" + std::to_string( tempValue );        
+    this->characterData.at(locationOfKey) = this->upper(key) + "." + std::to_string(masterValue) + ":" + std::to_string( ancillaryValue );        
 
     return returnStatus;
 }
@@ -475,24 +522,24 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
 void DnDsh::printStat( std::string datum ) {
 
     unsigned int locationOfTempValue = datum.find(':');
-    bool tempValueExists = ( locationOfTempValue < datum.size() );
+    bool ancillaryValueExists = ( locationOfTempValue < datum.size() );
 
     std::string stat = datum.substr(0, datum.find('.'));
     std::string masterValue;
-    std::string tempValue;
+    std::string ancillaryValue;
     
-    if( tempValueExists ) {
+    if( ancillaryValueExists ) {
         masterValue = datum.substr(datum.find('.') + 1, locationOfTempValue - datum.find('.') - 1);
-        tempValue = datum.substr(locationOfTempValue + 1, datum.size() - locationOfTempValue);
+        ancillaryValue = datum.substr(locationOfTempValue + 1, datum.size() - locationOfTempValue);
     } else {
         masterValue = datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1);
-        tempValue = "";
+        ancillaryValue = "";
     }
 
     std::cout << BOLDWHITE << stat << RESET << CYAN << ": " << RESET;
 
-    if( tempValueExists ) {
-        std::cout << BOLDRED << tempValue << RESET << CYAN << "/" << BOLDWHITE << masterValue << RESET;
+    if( ancillaryValueExists ) {
+        std::cout << BOLDRED << ancillaryValue << RESET << CYAN << "/" << BOLDWHITE << masterValue << RESET;
     } else {
         std::cout << BOLDWHITE << masterValue << RESET;
     }

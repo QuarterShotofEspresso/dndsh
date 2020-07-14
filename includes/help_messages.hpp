@@ -46,7 +46,7 @@
 
 #define DNDSH_HEALTH_CMD_HELP       "Sample Usage:\thp <modifier>\n"\
                                     "\t\thp reset\n"\
-                                    "\t\thp master <modifer>"\
+                                    "\t\thp master <modifer>\n"\
                                     "Description:\n"\
                                     "Health will adjust <ancillary_value> according to <modifer>. If <ancillary_value>\n"\
                                     "does not exist, health will create one and adjust it according to <modifer>. The reset\n"\
@@ -54,17 +54,20 @@
                                     "To adjust <master_value> the \'master\' option must be provided before <modifer>."
 
 
-#define DNDSH_MOD_CMD_HELP          "Sample Usage:\tmod <key> <new_value> [<new_ancillary_value>]\n"\
-                                    "NOTE:\t[<new_ancillary_value>] will by default leave everything unchanged"
+#define DNDSH_MOD_CMD_HELP          "Sample Usage:\tmod <key> <master_value> [<new_ancillary_value>]\n"\
+                                    "NOTE:\t[<new_ancillary_value>] will by default leave everything unchanged."
 
-#define DNDSH_ADD_CMD_HELP          "Sample Usage:\tadd <new_key> <new_value> [<new_ancillary_value>]\n"\
-                                    "NOTE:\t[<new_ancillary_value>] will, by default, append nothing to <new_key> after <new_value>"
+#define DNDSH_ADD_CMD_HELP          "Sample Usage:\tadd <new_key> <master_value> [<new_ancillary_value>]\n"\
+                                    "NOTE:\t[<new_ancillary_value>] will, by default, append nothing to <new_key> after <master_value>."
 
-#define DNDSH_RM_CMD_HELP           "Sample Usage:\trm <key>"
+#define DNDSH_RM_CMD_HELP           "Sample Usage:\trm <key>\n"\
+                                    "Deletes character data entry identified by <key>."
 
-#define DNDSH_LD_CMD_HELP           "Sample Usagae:\tld <file_path>"
+#define DNDSH_LD_CMD_HELP           "Sample Usagae:\tld <file_path>\n"\
+                                    "NOTE:\t<file_path> must be in the working directory, otherwise the absolute path must be provided."
 
-#define DNDSH_ST_CMD_HELP           "Sample Usage:\tst <file_path>"
+#define DNDSH_ST_CMD_HELP           "Sample Usage:\tst <file_path>\n"\
+                                    "NOTE:\t<file_path> must be in the working directory, otherwise the absolute path must be provided."
 
 #define DNDSH_MODIFIER_HELP         "+<modifier> : increase by <modifier>\n"\
                                     "<modifier>  : set value to <modifier>\n"\

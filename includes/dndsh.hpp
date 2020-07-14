@@ -37,7 +37,7 @@ class DnDsh {
 
     // json load and store
     int cmd_LOAD  ( const std::string &path );
-    int cmd_STORE ( const std::string &path );
+    int cmd_STORE ( std::string path );
 
 
     private:

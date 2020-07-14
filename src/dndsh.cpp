@@ -1,5 +1,6 @@
 #include "dndsh.hpp"
 #include "help_messages.hpp"
+#include <fstream>
 
 DnDsh::DnDsh() {
     this->characterData = {
@@ -398,15 +399,65 @@ int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
 
 // Sample Usagae:   ld <file_path>
 int DnDsh::cmd_LOAD( const std::string &path ) {
-    std::cout << "Need to implement LOAD" << std::endl;
+
+    if( path == "" ) {
+        std::cout << this->format_err( "file path missing. Type \'help load\' for more information." );
+        return 1;
+    }
+
+
+    std::ifstream file( path );
+
+    if( !file.is_open() ) {
+        std::cout << this->format_err( "file does not exist. Enter absolute path if file is not in working directory." );
+        return 1;
+    }
+
+
+    this->characterData.clear();
+    std::string inputDatum;
+    while( file >> inputDatum ) {
+        if( inputDatum != "" ) {
+            this->characterData.push_back(inputDatum);
+        }
+    }
+
+    file.close();
+    
+    std::cout << "Succesfully loaded data located at: " << path << std::endl;
+
     return 0;
 }
 
 
 
 // Sample Usage:    st <file_path>
-int DnDsh::cmd_STORE( const std::string &path ) {
-    std::cout << "Need to implement STORE" << std::endl;
+int DnDsh::cmd_STORE( std::string path ) {
+    
+    if( path == "" ) {
+        std::cout << this->format_err( "file path missing. Type \'help store\' for more information." );
+        return 1;
+    }
+
+    std::ofstream file;
+    file.open( path );
+
+    file << "Content:" << std::endl;
+   
+    if( !file.is_open() ) {
+        std::cout << this->format_err( "file access failure. Enter absolute path if file is not in working directory." );
+        return 1;
+    }
+
+    for( std::string outputDatum : this->characterData ) {
+        std::cout << "Character: " << outputDatum << std::endl;
+        file << outputDatum << std::endl;
+    }
+
+    file.close();
+
+    std::cout << "Succesfully stored data to: " << path << std::endl;
+
     return 0;
 }
 

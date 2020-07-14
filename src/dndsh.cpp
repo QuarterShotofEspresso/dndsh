@@ -354,11 +354,11 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
         std::cout << this->format_err( "incorrect usage: missing <new_primary_value>. Type \'help add\' to learn more" );
         return 1;
     }
-    
+
     newStat += "." + addEntry.front();
     addEntry.pop_front();
 
-    if( addEntry.front() != "" ) {    
+    if( addEntry.front() != "" ) { 
         newStat += ":" + addEntry.front();
     }
 

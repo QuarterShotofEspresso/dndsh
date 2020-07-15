@@ -113,7 +113,7 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
 // Sample Usage:    stat [<key>]           //NOTE: [<key>] entered empty will print out every stat
 int DnDsh::cmd_STATS( const std::string &key ) {
 
-    if( key == "" ) {
+    if( key.empty() ) {
         for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
             this->printStat(this->characterData.at(i)); 
             std::cout << std::endl;
@@ -174,22 +174,19 @@ int DnDsh::cmd_HELP( const std::string &command ) {
 
 
 // Sample Usage:    spell {<spell_level>|all} [<modifier>]        //NOTE: [<modifier>] is by default assumed as: -1
-//                  spell reset [<spell_level>]                   //NOTE: [<spell_level>] is by default 'all'
-//                  spell master {<spell_level>|all} <modifier>
+//                  spell master {<spell_level>|all} [<modifier>]
 int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
 
-    if( spellEntry.front() == "" ) {
+    std::string level = spellEntry.front();
+    spellEntry.pop_front();  
+
+    if( level.empty() ) {
         std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more." );
         return 1;
     }
 
-
-    int returnStatus = 0;
-   
     bool master = false;
     int locationOfKey;
-    std::string level = spellEntry.front();
-    spellEntry.pop_front();
 
     if( level == "master" ) {
         master = true;
@@ -209,54 +206,27 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
         }
 
         else {
-            return this->modifyRule( level, spellEntry.front(), master );
+            std::string modifier = spellEntry.front();
+            spellEntry.pop_front();
+            return this->modifyRule( level, modifier, master );
         }
     }
 
     else if( level == "all" ) {
+        std::string modifier = spellEntry.front();
+        spellEntry.pop_front();
+        if( modifier.empty() ) {
+            modifier = "-1";
+        }
+
         for( int i = 1; i < 10; i++ ) {
             locationOfKey = this->locateKey( "SS" + std::to_string(i) );
             if ( locationOfKey < 0 ) {
                 std::cout << "spell slot " << i << " does not exist. stopping..." << std::endl;
                 return 0;
             } else {
-                returnStatus = this->modifyRule( "SS" + std::to_string(i), spellEntry.front(), master );
-                if( returnStatus ) return 1;
+                if( this->modifyRule( "SS" + std::to_string(i), modifier, master ) ) return 1;
             }
-        }
-    }
-
-    else if( level == "reset" ) {
-        if( spellEntry.front() == "" ) {
-            for( int i = 1; i < 10; i++ ) {
-                locationOfKey = this->locateKey( "SS" + std::to_string(i) );
-                if ( locationOfKey < 0 ) {
-                    std::cout << "spell slot " << i << " does not exist. stopping..." << std::endl;
-                    return 0;
-                }
-                else {
-                    returnStatus = this->modifyRule( "SS" + std::to_string(i), "reset", master );
-                    if( returnStatus ) return 1;
-                }
-            }
-        }
-
-        else if( isdigit(spellEntry.front().at(0)) ) {
-            level = "SS" + spellEntry.front();
-            locationOfKey = this->locateKey( level );
-            if( locationOfKey < 0 ){
-                std::cout << this->format_err( "key not found: \'" + level + "\' does not exist. Add key using \'add\' command." );
-                return 1;
-            }
-
-            else {
-                return this->modifyRule( level, "reset", master );
-            }
-        }
-
-        else {
-            std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more" );
-            return 1;
         }
     }
 
@@ -270,32 +240,36 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
 
 
 // Sample Usage:    health <modifier>
-//                  heatlh reset
 //                  heatlh master <modifer>
-int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
+int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
    
-    int returnStatus = 0;
-    
+    // check if health key exists 
     if( this->locateKey( "HEALTH" ) < 0 ) {
         std::cout << this->format_err( "key not found: \'HEALTH\' does not exist. Add key using \'add\' command." );
         return 1;
-    } 
+    }
 
-    else if( modifyBy.front() == "" ) {
+    std::string modifier = healthEntry.front();
+    healthEntry.pop_front(); 
+
+    bool master = false;
+
+    // check if master flag has been set
+    if( modifier == "master" ) {
+        master = true;
+        modifier = healthEntry.front();
+        healthEntry.pop_front();
+    }
+
+    // check that argument exists
+    if( modifier.empty() ) {
         std::cout << this->format_err( "incorrect usage: type \'help health\' to learn more" );
         return 1;
     }
 
-    else if( modifyBy.front() == "master" ) {
-        modifyBy.pop_front();
-        returnStatus = this->modifyRule( "HEALTH", modifyBy.front(), true );
-    }
+    // modify health stat by modifier
+    return this->modifyRule( "HEALTH", modifier, master );
 
-    else {
-        returnStatus = this->modifyRule( "HEALTH", modifyBy.front(), false );
-    }
-
-    return returnStatus;
 }
 
 
@@ -304,7 +278,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &modifyBy ) {
 int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
     if( modEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <stat>. Type \'help mod\' to learn more" );
+        std::cout << this->format_err( "incorrect usage: missing <key>. Type \'help mod\' to learn more" );
         return 1;
     }
 
@@ -318,7 +292,7 @@ int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
     }
 
     if( modEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_value>. Type \'help mod\' to learn more" );
+        std::cout << this->format_err( "incorrect usage: missing <new_master_value>. Type \'help mod\' to learn more" );
         return 1;
     }
 
@@ -342,30 +316,35 @@ int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
 
 
-// Sample Usage:    add <new_stat> <new_value> [<new_ancillary_value>]    //NOTE: [<new_ancillary_value>] will by deafult skip appending a new_ancillary_value to new_key
+// Sample Usage:    add <new_key> <new_value> [<new_ancillary_value>]    //NOTE: [<new_ancillary_value>] will by deafult skip appending a new_ancillary_value to new_key
 int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 
-    if( addEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_stat>. Type \'help add\' to learn more" );
+    std::string newKey = addEntry.front();
+    addEntry.pop_front();
+
+    if( newKey.empty() ) {
+        std::cout << this->format_err( "incorrect usage: missing <new_key>. Type \'help add\' to learn more" );
         return 1;
     }
 
-    std::string newStat = this->upper(addEntry.front());
+    newKey = this->upper( newKey );
+    std::string newMasterValue = addEntry.front();
     addEntry.pop_front();
 
-    if( addEntry.front() == "" ) {
+    if( newMasterValue.empty() ) {
         std::cout << this->format_err( "incorrect usage: missing <new_primary_value>. Type \'help add\' to learn more" );
         return 1;
     }
 
-    newStat += "." + addEntry.front();
+    std::string newAncillaryValue = addEntry.front();
     addEntry.pop_front();
 
-    if( addEntry.front() != "" ) { 
-        newStat += ":" + addEntry.front();
+    std::string newStat = newKey + "." + newMasterValue;
+    if( newAncillaryValue.empty() ) {
+        newStat += ":" + newAncillaryValue;
     }
 
-    std::cout << "Added: " << newStat << std::endl;
+    // std::cout << "Added: " << newStat << std::endl; // dbg
 
     this->characterData.push_back( newStat );
 
@@ -377,21 +356,19 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 // Sample Usage:    rm  <key>
 int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
     
-    if( stat == "" ) {
+    if( stat.empty() ) {
         std::cout << this->format_err( "incorrect usage: type \'help remove\' to learn more" );
         return 1;
     }
 
-    else {
-        int locationOfKey = this->locateKey( stat );
-        if ( locationOfKey < 0 ) {
-            std::cout << this->format_err( "stat not found: type \'ls\' for a list of available stats" );
-            return 1;
-        }
+    int locationOfKey = this->locateKey( stat );
+    if ( locationOfKey < 0 ) {
+        std::cout << this->format_err( "stat not found: type \'ls\' for a list of available stats" );
+        return 1;
+    }
 
-        else {
-            this->characterData.erase( characterData.begin() + locationOfKey );
-        }
+    else {
+        this->characterData.erase( characterData.begin() + locationOfKey );
     }
 
     return 0;
@@ -402,7 +379,7 @@ int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
 // Sample Usagae:   ld <file_path>
 int DnDsh::cmd_LOAD( const std::string &path ) {
 
-    if( path == "" ) {
+    if( path.empty() ) {
         std::cout << this->format_err( "file path missing. Type \'help load\' for more information." );
         return 1;
     }
@@ -436,7 +413,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
 // Sample Usage:    st <file_path>
 int DnDsh::cmd_STORE( const std::string &path ) {
     
-    if( path == "" ) {
+    if( path.empty() ) {
         std::cout << this->format_err( "file path missing. Type \'help store\' for more information." );
         return 1;
     }
@@ -593,10 +570,11 @@ void DnDsh::printStat( const std::string &datum ) {
     // if masterValue is a path, find and load content from path to document
     bool masterValueIsFile = masterValue.find(".csv") < datum.size();
     if( masterValueIsFile ) {
+        masterValue.clear();
         std::ifstream file( masterValue );
         std::string fileContent;
         while( getline(file, fileContent) ) {
-            masterValue += fileContent;
+            masterValue += "\n" + fileContent;
         }
     }
 

@@ -11,6 +11,7 @@
                                     "remove/rm:             delete a stat\n"\
                                     "load/ld:               load stats in xml file\n"\
                                     "store/st:              store stats in xml file\n"\
+                                    "modifier:              valid modifiers\n"\
                                     "type \'help <command>\' for more information"
 
 
@@ -71,6 +72,7 @@
 
 #define DNDSH_MODIFIER_HELP         "+<modifier> : increase by <modifier>\n"\
                                     "<modifier>  : set value to <modifier>\n"\
-                                    "-<modifier> : substract by <modifier>"
+                                    "-<modifier> : substract by <modifier>\n"\
+                                    "reset       : set <ancillary_value> to <master_value>"
 
 #endif //__DNDSH_HELP_MESSAGES__

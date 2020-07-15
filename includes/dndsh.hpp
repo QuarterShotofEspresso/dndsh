@@ -24,7 +24,7 @@ class DnDsh {
 
     /////// command sequences///////
     // miscillaneous sequences
-    int cmd_ROLL    ( std::string command );
+    int cmd_ROLL    ( const std::string &command );
     int cmd_STATS   ( const std::string &key );
     int cmd_HELP    ( const std::string &command );
     // specialized modifier seqeunce(s)
@@ -37,24 +37,22 @@ class DnDsh {
 
     // json load and store
     int cmd_LOAD  ( const std::string &path );
-    int cmd_STORE ( std::string path );
+    int cmd_STORE ( const std::string &path );
 
 
     private:
     // helper function(s)
     int roll( int times, int modulus );
-    int locateKey( std::string key );
+    int locateKey( const std::string &key );
     std::string upper( std::string input );
     // +<modifier> : increase by <modifier>
     // <modifier>  : set value to <modifier>
     // -<modifier> : substract by <modifier>
     // reset       : set <temp_value> to <master_value>
-    int modifyRule( std::string key, std::string modifyBy, bool master );
-    void printStat( std::string datum );
-    std::string format_err( std::string message );
+    int modifyRule( const std::string &key, const std::string &modifyBy, bool master );
+    void printStat( const std::string &datum );
+    std::string format_err( const std::string &message );
 };
 
-
-constexpr unsigned int dndsh_hash( const char input[] );
 
 #endif //__DNDSH_HPP__

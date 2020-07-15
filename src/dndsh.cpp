@@ -63,7 +63,7 @@ int DnDsh::cmd_REQ( std::string input ) {
 }
 
 
-int DnDsh::cmd_ROLL( std::string command ) {
+int DnDsh::cmd_ROLL( const std::string &command ) {
 
     if( command == "d" ) {
         std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
@@ -161,6 +161,8 @@ int DnDsh::cmd_HELP( const std::string &command ) {
         std::cout << DNDSH_LD_CMD_HELP << std::endl;
     } else if( command == "store" || command == "st" ) {
         std::cout << DNDSH_ST_CMD_HELP << std::endl;
+    } else if( command == "modifier" ) {
+        std::cout << DNDSH_MODIFIER_HELP << std::endl;
     } else {
         std::cout << this->format_err( "unknown command: type \'help\' for a list of commands" );
         return 1;
@@ -432,7 +434,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
 
 
 // Sample Usage:    st <file_path>
-int DnDsh::cmd_STORE( std::string path ) {
+int DnDsh::cmd_STORE( const std::string &path ) {
     
     if( path == "" ) {
         std::cout << this->format_err( "file path missing. Type \'help store\' for more information." );
@@ -476,7 +478,7 @@ int DnDsh::roll(int times, int modulus) {
 }
 
 
-int DnDsh::locateKey( std::string key ) {
+int DnDsh::locateKey( const std::string &key ) {
     
     std::string capKey = this->upper( key );
 
@@ -498,7 +500,7 @@ std::string DnDsh::upper( std::string input ) {
 }
 
 
-int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
+int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool master ) {
 
     int returnStatus = 0;
 
@@ -551,7 +553,7 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
     }
 
 
-    // adjust ancillary value and max value to respected bounds
+    // adjust ancillary value and master value to respected bounds
     if( ancillaryValue < 0 ) { 
         ancillaryValue = 0;
     } else if( ancillaryValue > masterValue ) {
@@ -568,9 +570,7 @@ int DnDsh::modifyRule( std::string key, std::string modifyBy, bool master ) {
 }
 
 
-
-
-void DnDsh::printStat( std::string datum ) {
+void DnDsh::printStat( const std::string &datum ) {
 
     unsigned int locationOfTempValue = datum.find(':');
     bool ancillaryValueExists = ( locationOfTempValue < datum.size() );
@@ -578,7 +578,9 @@ void DnDsh::printStat( std::string datum ) {
     std::string stat = datum.substr(0, datum.find('.'));
     std::string masterValue;
     std::string ancillaryValue;
-    
+
+
+    // load variables with default master and ancillary values
     if( ancillaryValueExists ) {
         masterValue = datum.substr(datum.find('.') + 1, locationOfTempValue - datum.find('.') - 1);
         ancillaryValue = datum.substr(locationOfTempValue + 1, datum.size() - locationOfTempValue);
@@ -586,11 +588,24 @@ void DnDsh::printStat( std::string datum ) {
         masterValue = datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1);
         ancillaryValue = "";
     }
+ 
 
+    // if masterValue is a path, find and load content from path to document
+    bool masterValueIsFile = masterValue.find(".csv") < datum.size();
+    if( masterValueIsFile ) {
+        std::ifstream file( masterValue );
+        std::string fileContent;
+        while( getline(file, fileContent) ) {
+            masterValue += fileContent;
+        }
+    }
+
+
+    // print content
     std::cout << BOLDWHITE << stat << RESET << CYAN << ": " << RESET;
 
     if( ancillaryValueExists ) {
-        std::cout << BOLDRED << ancillaryValue << RESET << CYAN << "/" << BOLDWHITE << masterValue << RESET;
+        std::cout << BOLDWHITE << masterValue << RESET << CYAN << "(" << BOLDRED << ancillaryValue << RESET << CYAN << ")";
     } else {
         std::cout << BOLDWHITE << masterValue << RESET;
     }
@@ -600,7 +615,7 @@ void DnDsh::printStat( std::string datum ) {
 
 
 
-std::string DnDsh::format_err( std::string message ) {
+std::string DnDsh::format_err( const std::string &message ) {
 
     std::ostringstream formatStream;
     std::string formattedString;

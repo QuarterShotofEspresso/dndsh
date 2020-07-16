@@ -1,5 +1,4 @@
 things TODO till Alpha Testing can begin:
-move error messages to header file
 continue cleaning redundant code (SPELL/modifyRule/etc..)
 rename some functions? (consider moving printStat to format_stat or format_err to formatErr and printStat to formatStat)
 integrate PRIMARY/SECONDARY color schemes (making things more customizable) and cleaning up code

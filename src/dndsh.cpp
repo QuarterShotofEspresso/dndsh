@@ -1,5 +1,6 @@
 #include "dndsh.hpp"
 #include "help_messages.hpp"
+#include "error_messages.hpp"
 #include <fstream>
 
 DnDsh::DnDsh() {
@@ -66,7 +67,7 @@ int DnDsh::cmd_REQ( std::string input ) {
 int DnDsh::cmd_ROLL( const std::string &command ) {
 
     if( command == "d" ) {
-        std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
+        std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
         return 1;
     }
     
@@ -76,14 +77,14 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
 
         for( int i = 0; i < locationOfd; i++ ) {
             if( !isdigit(command.at(i)) ) {
-                std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
+                std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
                 return 1;
             }
         }
 
         for( unsigned int i = (locationOfd + 1); i < command.size(); i++ ) {
             if( !isdigit(command.at(i)) ) {
-                std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
+                std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
                 return 1;
             }
         }
@@ -97,12 +98,12 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
         std::cout << CYAN << "rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
     }
 
-    else if( command.size() == 0 ) {
+    else if( command.empty() ) {
         return 0;
     }
 
    else {
-        std::cout << this->format_err( "unknown command. Type \'help\' for a list of commands" );
+        std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
         return 1;
     }
  
@@ -128,7 +129,7 @@ int DnDsh::cmd_STATS( const std::string &key ) {
         }
 
         else {
-            std::cout << this->format_err( "stat: stat not found. Type \'ls\' for a list of stats" ); 
+            std::cout << this->format_err( KEY_NOT_FOUND_ERR ); 
             return 1;
         }
     }
@@ -164,7 +165,7 @@ int DnDsh::cmd_HELP( const std::string &command ) {
     } else if( command == "modifier" ) {
         std::cout << DNDSH_MODIFIER_HELP << std::endl;
     } else {
-        std::cout << this->format_err( "unknown command: type \'help\' for a list of commands" );
+        std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
         return 1;
     }
 
@@ -181,7 +182,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
     spellEntry.pop_front();  
 
     if( level.empty() ) {
-        std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more." );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(spell) );
         return 1;
     }
 
@@ -201,7 +202,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
         locationOfKey = this->locateKey( level );
 
         if( locationOfKey < 0 ) {
-            this->format_err( "key not found: \'" + level + "\' does not exist. Add key using \'add\' command." );
+            this->format_err( KEY_NOT_FOUND_ERR );
             return 1;
         }
 
@@ -231,7 +232,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
     }
 
     else {
-        std::cout << this->format_err( "incorrect usage: type \'help spell\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(spell) );
     }
 
     return 0;
@@ -245,7 +246,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
    
     // check if health key exists 
     if( this->locateKey( "HEALTH" ) < 0 ) {
-        std::cout << this->format_err( "key not found: \'HEALTH\' does not exist. Add key using \'add\' command." );
+        std::cout << this->format_err( KEY_NOT_FOUND_ERR );
         return 1;
     }
 
@@ -263,7 +264,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
 
     // check that argument exists
     if( modifier.empty() ) {
-        std::cout << this->format_err( "incorrect usage: type \'help health\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(heal) );
         return 1;
     }
 
@@ -278,7 +279,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
 int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
     if( modEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <key>. Type \'help mod\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(mod) );
         return 1;
     }
 
@@ -287,12 +288,12 @@ int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
     int locationOfKey = this->locateKey( stat );
     if( locationOfKey < 0 ) {
-        std::cout << this->format_err( "stat not found: type \'ls\' for a list of available stats" );
+        std::cout << this->format_err( KEY_NOT_FOUND_ERR );
         return 1;
     }
 
     if( modEntry.front() == "" ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_master_value>. Type \'help mod\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(mod) );
         return 1;
     }
 
@@ -323,7 +324,7 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
     addEntry.pop_front();
 
     if( newKey.empty() ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_key>. Type \'help add\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(add) );
         return 1;
     }
 
@@ -332,7 +333,7 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
     addEntry.pop_front();
 
     if( newMasterValue.empty() ) {
-        std::cout << this->format_err( "incorrect usage: missing <new_primary_value>. Type \'help add\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(add) );
         return 1;
     }
 
@@ -357,13 +358,13 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
     
     if( stat.empty() ) {
-        std::cout << this->format_err( "incorrect usage: type \'help remove\' to learn more" );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(remove) );
         return 1;
     }
 
     int locationOfKey = this->locateKey( stat );
     if ( locationOfKey < 0 ) {
-        std::cout << this->format_err( "stat not found: type \'ls\' for a list of available stats" );
+        std::cout << this->format_err( KEY_NOT_FOUND_ERR );
         return 1;
     }
 
@@ -380,7 +381,7 @@ int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
 int DnDsh::cmd_LOAD( const std::string &path ) {
 
     if( path.empty() ) {
-        std::cout << this->format_err( "file path missing. Type \'help load\' for more information." );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(load) );
         return 1;
     }
 
@@ -388,7 +389,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
     std::ifstream file( path );
 
     if( !file.is_open() ) {
-        std::cout << this->format_err( "file does not exist. Enter absolute path if file is not in working directory." );
+        std::cout << this->format_err( FILE_ACCESS_FAIL_ERR );
         return 1;
     }
 
@@ -403,7 +404,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
 
     file.close();
     
-    std::cout << "Succesfully loaded data located at: " << path << std::endl;
+    std::cout << "Succesfully loaded data from: " << path << std::endl;
 
     return 0;
 }
@@ -414,22 +415,19 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
 int DnDsh::cmd_STORE( const std::string &path ) {
     
     if( path.empty() ) {
-        std::cout << this->format_err( "file path missing. Type \'help store\' for more information." );
+        std::cout << this->format_err( INCORRECT_USAGE_ERR(store) );
         return 1;
     }
 
     std::ofstream file;
     file.open( path );
-
-    file << "Content:" << std::endl;
-   
+ 
     if( !file.is_open() ) {
-        std::cout << this->format_err( "file access failure. Enter absolute path if file is not in working directory." );
+        std::cout << this->format_err( FILE_ACCESS_FAIL_ERR );
         return 1;
     }
 
     for( std::string outputDatum : this->characterData ) {
-        std::cout << "Character: " << outputDatum << std::endl;
         file << outputDatum << std::endl;
     }
 
@@ -511,7 +509,7 @@ int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool
 
     else if( modifyBy == "reset" ) {
         if( master ){
-            std::cout << this->format_err("modifier rule: cannot reset master value");
+            std::cout << this->format_err( "modifier rule: cannot reset master value" );
             return 1;
         }
 

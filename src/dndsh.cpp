@@ -67,7 +67,7 @@ int DnDsh::cmd_REQ( std::string input ) {
 int DnDsh::cmd_ROLL( const std::string &command ) {
 
     if( command == "d" ) {
-        std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
+        std::cout << this->formatErr( UNKNOWN_COMMAND_ERR );
         return 1;
     }
     
@@ -77,14 +77,14 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
 
         for( int i = 0; i < locationOfd; i++ ) {
             if( !isdigit(command.at(i)) ) {
-                std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
+                std::cout << this->formatErr( UNKNOWN_COMMAND_ERR );
                 return 1;
             }
         }
 
         for( unsigned int i = (locationOfd + 1); i < command.size(); i++ ) {
             if( !isdigit(command.at(i)) ) {
-                std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
+                std::cout << this->formatErr( UNKNOWN_COMMAND_ERR );
                 return 1;
             }
         }
@@ -103,7 +103,7 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
     }
 
    else {
-        std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
+        std::cout << this->formatErr( UNKNOWN_COMMAND_ERR );
         return 1;
     }
  
@@ -116,20 +116,18 @@ int DnDsh::cmd_STATS( const std::string &key ) {
 
     if( key.empty() ) {
         for( unsigned int i = 0; i < this->characterData.size(); i++ ) {
-            this->printStat(this->characterData.at(i)); 
-            std::cout << std::endl;
+            std::cout << this->formatStat(this->characterData.at(i));
         }
     }
 
     else {
         unsigned int locationOfKey = this->locateKey( key );
         if ( locationOfKey < this->characterData.size() ) {
-            this->printStat( this->characterData.at( locationOfKey ) );
-            std::cout << std::endl;
+            this->formatStat( this->characterData.at( locationOfKey ) );
         }
 
         else {
-            std::cout << this->format_err( KEY_NOT_FOUND_ERR ); 
+            std::cout << this->formatErr( KEY_NOT_FOUND_ERR ); 
             return 1;
         }
     }
@@ -165,7 +163,7 @@ int DnDsh::cmd_HELP( const std::string &command ) {
     } else if( command == "modifier" ) {
         std::cout << DNDSH_MODIFIER_HELP << std::endl;
     } else {
-        std::cout << this->format_err( UNKNOWN_COMMAND_ERR );
+        std::cout << this->formatErr( UNKNOWN_COMMAND_ERR );
         return 1;
     }
 
@@ -182,7 +180,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
     spellEntry.pop_front();  
 
     if( level.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(spell) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(spell) );
         return 1;
     }
 
@@ -202,7 +200,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
         locationOfKey = this->locateKey( level );
 
         if( locationOfKey < 0 ) {
-            this->format_err( KEY_NOT_FOUND_ERR );
+            this->formatErr( KEY_NOT_FOUND_ERR );
             return 1;
         }
 
@@ -232,7 +230,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
     }
 
     else {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(spell) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(spell) );
     }
 
     return 0;
@@ -246,7 +244,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
    
     // check if health key exists 
     if( this->locateKey( "HEALTH" ) < 0 ) {
-        std::cout << this->format_err( KEY_NOT_FOUND_ERR );
+        std::cout << this->formatErr( KEY_NOT_FOUND_ERR );
         return 1;
     }
 
@@ -264,7 +262,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
 
     // check that argument exists
     if( modifier.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(heal) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(heal) );
         return 1;
     }
 
@@ -279,7 +277,7 @@ int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
 int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
     if( modEntry.front() == "" ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(mod) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(mod) );
         return 1;
     }
 
@@ -288,12 +286,12 @@ int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
     int locationOfKey = this->locateKey( stat );
     if( locationOfKey < 0 ) {
-        std::cout << this->format_err( KEY_NOT_FOUND_ERR );
+        std::cout << this->formatErr( KEY_NOT_FOUND_ERR );
         return 1;
     }
 
     if( modEntry.front() == "" ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(mod) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(mod) );
         return 1;
     }
 
@@ -324,7 +322,7 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
     addEntry.pop_front();
 
     if( newKey.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(add) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(add) );
         return 1;
     }
 
@@ -333,7 +331,7 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
     addEntry.pop_front();
 
     if( newMasterValue.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(add) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(add) );
         return 1;
     }
 
@@ -358,13 +356,13 @@ int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
     
     if( stat.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(remove) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(remove) );
         return 1;
     }
 
     int locationOfKey = this->locateKey( stat );
     if ( locationOfKey < 0 ) {
-        std::cout << this->format_err( KEY_NOT_FOUND_ERR );
+        std::cout << this->formatErr( KEY_NOT_FOUND_ERR );
         return 1;
     }
 
@@ -381,7 +379,7 @@ int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
 int DnDsh::cmd_LOAD( const std::string &path ) {
 
     if( path.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(load) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(load) );
         return 1;
     }
 
@@ -389,7 +387,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
     std::ifstream file( path );
 
     if( !file.is_open() ) {
-        std::cout << this->format_err( FILE_ACCESS_FAIL_ERR );
+        std::cout << this->formatErr( FILE_ACCESS_FAIL_ERR );
         return 1;
     }
 
@@ -415,7 +413,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
 int DnDsh::cmd_STORE( const std::string &path ) {
     
     if( path.empty() ) {
-        std::cout << this->format_err( INCORRECT_USAGE_ERR(store) );
+        std::cout << this->formatErr( INCORRECT_USAGE_ERR(store) );
         return 1;
     }
 
@@ -423,7 +421,7 @@ int DnDsh::cmd_STORE( const std::string &path ) {
     file.open( path );
  
     if( !file.is_open() ) {
-        std::cout << this->format_err( FILE_ACCESS_FAIL_ERR );
+        std::cout << this->formatErr( FILE_ACCESS_FAIL_ERR );
         return 1;
     }
 
@@ -509,7 +507,7 @@ int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool
 
     else if( modifyBy == "reset" ) {
         if( master ){
-            std::cout << this->format_err( "modifier rule: cannot reset master value" );
+            std::cout << this->formatErr( "modifier rule: cannot reset master value" );
             return 1;
         }
 
@@ -519,7 +517,7 @@ int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool
     else {
         for( char i : modifyBy ) {
             if( !isdigit(i) ) {
-                std::cout << this->format_err( "modifier rule: unknown modifer" );
+                std::cout << this->formatErr( "modifier rule: unknown modifer" );
                 return 1;
             }
         }
@@ -545,7 +543,7 @@ int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool
 }
 
 
-void DnDsh::printStat( const std::string &datum ) {
+std::string DnDsh::formatStat( const std::string &datum ) {
 
     unsigned int locationOfTempValue = datum.find(':');
     bool ancillaryValueExists = ( locationOfTempValue < datum.size() );
@@ -578,20 +576,23 @@ void DnDsh::printStat( const std::string &datum ) {
 
 
     // print content
-    std::cout << BOLDWHITE << stat << RESET << CYAN << ": " << RESET;
+    std::ostringstream formatStream;
+    formatStream << BOLDWHITE << stat << RESET << CYAN << ": " << RESET;
 
     if( ancillaryValueExists ) {
-        std::cout << BOLDWHITE << masterValue << RESET << CYAN << "(" << BOLDRED << ancillaryValue << RESET << CYAN << ")";
+        formatStream << BOLDWHITE << masterValue << RESET << CYAN << "(" << BOLDRED << ancillaryValue << RESET << CYAN << ")";
     } else {
-        std::cout << BOLDWHITE << masterValue << RESET;
+        formatStream << BOLDWHITE << masterValue << RESET;
     }
 
-    return;
+    formatStream << std::endl;
+
+    return formatStream.str();
 }
 
 
 
-std::string DnDsh::format_err( const std::string &message ) {
+std::string DnDsh::formatErr( const std::string &message ) {
 
     std::ostringstream formatStream;
     std::string formattedString;

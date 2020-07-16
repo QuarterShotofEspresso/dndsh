@@ -1,6 +1,5 @@
 things TODO till Alpha Testing can begin:
 continue cleaning redundant code (SPELL/modifyRule/etc..)
-rename some functions? (consider moving printStat to format_stat or format_err to formatErr and printStat to formatStat)
 integrate PRIMARY/SECONDARY color schemes (making things more customizable) and cleaning up code
 consider integrating vim so as to ease up external file access and modification
 consider adding clear screen command (clear/c)

@@ -50,8 +50,8 @@ class DnDsh {
     // -<modifier> : substract by <modifier>
     // reset       : set <temp_value> to <master_value>
     int modifyRule( const std::string &key, const std::string &modifyBy, bool master );
-    void printStat( const std::string &datum );
-    std::string format_err( const std::string &message );
+    std::string formatStat( const std::string &datum );
+    std::string formatErr( const std::string &message );
 };
 
 

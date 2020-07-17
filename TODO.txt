@@ -1,7 +1,6 @@
 things TODO till Alpha Testing can begin:
 continue cleaning redundant code (SPELL/modifyRule/etc..)
 consider integrating vim so as to ease up external file access and modification
-consider adding clear screen command (clear/c)
 add more information about the idea/philiosphy behind dndsh's design -- important to explain flexibility for roommates to get
 
 

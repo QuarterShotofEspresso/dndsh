@@ -61,6 +61,10 @@ int DnDsh::cmd_REQ( std::string input ) {
         returnStatus = cmd_LOAD( commandTokens.front() );
     } else if( command == "store" || command == "st" ) {
         returnStatus = cmd_STORE( commandTokens.front() );
+    } else if( command == "clear" || command == "c" ) {
+        returnStatus = system("clear");
+    } else if( command == "vim" ) {
+        returnStatus = system( input.c_str() );
     } else if( command == "exit") {
         returnStatus = -1;
     } else {

@@ -22,12 +22,14 @@ Well, good luck sir! And SAFE TRAVELS! MAY `<enter_deity_here>` BE WITH YOU!
 
 ## DnDsh Command Classifications
 Modifier Commands:
-Basic General Modifiers:    `add`, `remove`
+Basic General Modifier(s):    `add`, `remove`
 
-General Modifier:           `mod`
+General Modifier(s):          `mod`
 
-Special Modifiers:          `spell`, `health`
+Special Modifier(s):          `spell`, `health`
 
-Visualizer Commands:
-Visualizer:                 `ls`
+Additional Commands:
+Visualizer Commands:          `ls`
+
+Save and Write Command(s):    `store`, `load`
 

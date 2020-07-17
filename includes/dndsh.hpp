@@ -16,24 +16,25 @@ class DnDsh {
 
 
     public:
-    DnDsh();
+    DnDsh() { }
     // initialize and loop command prompter
-    int cmd_REQ( std::string input ); // launch terminal
+    int parse( std::string input ); // launch terminal
 
     /////// command sequences///////
-    // miscillaneous sequences
+    // miscillaneous
     int cmd_ROLL    ( const std::string &command );
-    int cmd_STATS   ( const std::string &key );
     int cmd_HELP    ( const std::string &command );
-    // specialized modifier seqeunce(s)
+    // special modifier
     int cmd_SPELL   ( std::list<std::string> &spellEntry );
     int cmd_HEALTH  ( std::list<std::string> &modifyBy );
-    // gerneral modifier seqeunces(s)
+    // gerneral modifier
     int cmd_MODSTAT ( std::list<std::string> &modifier );
+    // speical modifier
     int cmd_ADDSTAT ( std::list<std::string> &addEntry );
     int cmd_RMVSTAT ( const std::string &stat );
-
-    // json load and store
+    // visualizer commands
+    int cmd_LIST    ( const std::string &key );
+    // load and store
     int cmd_LOAD  ( const std::string &path );
     int cmd_STORE ( const std::string &path );
 

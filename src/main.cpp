@@ -19,7 +19,7 @@ int main( void ) {
             command = readline( "\033[32m$> \033[0m" );
         }
 
-        returnStatus = newShell.cmd_REQ( command );
+        returnStatus = newShell.parse( command );
 
     }
 
@@ -29,7 +29,7 @@ int main( void ) {
         std::cout << RESET << "Path to existing file or create new file: " << BOLDYELLOW;
         std::cin >> command;
         std::cout << RESET << "Saving Character..." << std::endl;
-        // newShell.cmd_STORE( command );
+        newShell.cmd_STORE( command );
         std::cout << "Character Saved." << std::endl;
     }
 

@@ -11,22 +11,22 @@
 #define TERTIARY_COLOR RESET << BOLDRED
 
 
-// sample constructor for debugging
-DnDsh::DnDsh() {
-    this->characterData = {
-        "NAME.Tywin",
-        "STRENGTH.15",
-        "HEALTH.25:6",
-        "DEXTERITY.10",
-        "SS1.5",
-        "SS2.10",
-        "SS3.4"
-    };
-}
+//// sample constructor for debugging
+//DnDsh::DnDsh() {
+//    this->characterData = {
+//        "NAME.Tywin",
+//        "STRENGTH.15",
+//        "HEALTH.25:6",
+//        "DEXTERITY.10",
+//        "SS1.5",
+//        "SS2.10",
+//        "SS3.4"
+//    };
+//}
 
 
 
-int DnDsh::cmd_REQ( std::string input ) {
+int DnDsh::parse( std::string input ) {
    
     std::istringstream inputStream(input);
     std::string token;
@@ -46,7 +46,7 @@ int DnDsh::cmd_REQ( std::string input ) {
     if( command == "spell" || command == "sp" ) {
         returnStatus = cmd_SPELL( commandTokens );
     } else if( command == "ls" || command == "l" ) {
-        returnStatus = cmd_STATS( commandTokens.front() );
+        returnStatus = cmd_LIST( commandTokens.front() );
     } else if( command == "help" ) {
         returnStatus = cmd_HELP( commandTokens.front() );
     } else if( command == "health" || command == "hp" ) {
@@ -126,7 +126,7 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
 
 
 // Sample Usage:    stat [<key>]           //NOTE: [<key>] entered empty will print out every stat
-int DnDsh::cmd_STATS( const std::string &key ) {
+int DnDsh::cmd_LIST( const std::string &key ) {
 
     if( key.empty() ) {
         for( unsigned int i = 0; i < this->characterData.size(); i++ ) {

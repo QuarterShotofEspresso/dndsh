@@ -1,8 +1,10 @@
 things TODO till Alpha Testing can begin:
 continue cleaning redundant code (SPELL/modifyRule/etc..)
-consider integrating vim so as to ease up external file access and modification
 add more information about the idea/philiosphy behind dndsh's design -- important to explain flexibility for roommates to get
 
 
 New Idea
 add dnd as a command to set particular commands as defaults for already working shell. So a dndsh extention
+now that vim has been added, it's a little difficult trying to know exactly what files exist and what new to make:::::::
+^^^^ The option of adding all available system commands exists. But it just feels really clunky calling system
+^^^^ The option of adding cd, ls, and mkdir also exists, but makes me feel like I'm cheap

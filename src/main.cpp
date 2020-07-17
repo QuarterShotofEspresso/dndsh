@@ -1,4 +1,5 @@
 #include "dndsh.hpp"
+#include <readline/readline.h>
 
 
 int main( void ) {

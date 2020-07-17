@@ -5,9 +5,7 @@
 #include <vector>
 #include <list>
 #include <iostream>
-#include <readline/readline.h>
 #include "linux_color_schemes.hpp"
-#include <sstream>
 
 // data stored as {<stat_key>.<primary_value>[:<secondary_value>]}
 // data stored as {"STRENGTH.5", "HEALTH.25:16", "NAME.Tywin", "SAVING:~/dnd/tywin.sd"}

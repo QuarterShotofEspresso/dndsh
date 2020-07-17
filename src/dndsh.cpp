@@ -2,6 +2,7 @@
 #include "help_messages.hpp"
 #include "error_messages.hpp"
 #include <fstream>
+#include <sstream>
 
 
 // setting color schemes

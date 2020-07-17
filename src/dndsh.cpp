@@ -3,6 +3,14 @@
 #include "error_messages.hpp"
 #include <fstream>
 
+
+// setting color schemes
+#define PRIMARY_COLOR RESET << BOLDWHITE
+#define SECONDARY_COLOR RESET << CYAN
+#define TERTIARY_COLOR RESET << BOLDRED
+
+
+// sample constructor for debugging
 DnDsh::DnDsh() {
     this->characterData = {
         "NAME.Tywin",
@@ -14,6 +22,7 @@ DnDsh::DnDsh() {
         "SS3.4"
     };
 }
+
 
 
 int DnDsh::cmd_REQ( std::string input ) {
@@ -95,7 +104,7 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
         rollTimes = (command.find('d') == 0) ? 1 : stoi(command.substr(0, command.find('d')));
         rollMod = stoi(command.substr(command.find('d') + 1, command.length()));
 
-        std::cout << CYAN << "rolled: " << BOLDWHITE << roll(rollTimes, rollMod) << RESET << std::endl;
+        std::cout << SECONDARY_COLOR << "rolled: " << PRIMARY_COLOR << roll(rollTimes, rollMod) << RESET << std::endl;
     }
 
     else if( command.empty() ) {
@@ -239,7 +248,7 @@ int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
 
 
 // Sample Usage:    health <modifier>
-//                  heatlh master <modifer>
+//                  health master <modifier>
 int DnDsh::cmd_HEALTH( std::list<std::string> &healthEntry ) {
    
     // check if health key exists 
@@ -315,7 +324,7 @@ int DnDsh::cmd_MODSTAT( std::list<std::string> &modEntry ) {
 
 
 
-// Sample Usage:    add <new_key> <new_value> [<new_ancillary_value>]    //NOTE: [<new_ancillary_value>] will by deafult skip appending a new_ancillary_value to new_key
+// Sample Usage:    add <new_key> <new_value> [<new_ancillary_value>]    //NOTE: [<new_ancillary_value>] will by default skip appending a new_ancillary_value to new_key
 int DnDsh::cmd_ADDSTAT( std::list<std::string> &addEntry ) {
 
     std::string newKey = addEntry.front();
@@ -375,7 +384,7 @@ int DnDsh::cmd_RMVSTAT( const std::string &stat ) {
 
 
 
-// Sample Usagae:   ld <file_path>
+// Sample Usage:   ld <file_path>
 int DnDsh::cmd_LOAD( const std::string &path ) {
 
     if( path.empty() ) {
@@ -402,7 +411,7 @@ int DnDsh::cmd_LOAD( const std::string &path ) {
 
     file.close();
     
-    std::cout << "Succesfully loaded data from: " << path << std::endl;
+    std::cout << "Successfully loaded data from: " << path << std::endl;
 
     return 0;
 }
@@ -431,7 +440,7 @@ int DnDsh::cmd_STORE( const std::string &path ) {
 
     file.close();
 
-    std::cout << "Succesfully stored data to: " << path << std::endl;
+    std::cout << "Successfully stored data to: " << path << std::endl;
 
     return 0;
 }
@@ -489,7 +498,8 @@ int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool
         masterValue = std::stoi(datum.substr(datum.find('.') + 1, datum.find(':') - datum.find('.') - 1));
         ancillaryValue = std::stoi(datum.substr(datum.find(':') + 1, datum.size() - datum.find(':') - 1));
     } else {
-        masterValue = ancillaryValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1));
+        masterValue = std::stoi(datum.substr(datum.find('.') + 1, datum.size() - datum.find('.') - 1));
+        ancillaryValue = masterValue;
     }
 
     
@@ -517,7 +527,7 @@ int DnDsh::modifyRule( const std::string &key, const std::string &modifyBy, bool
     else {
         for( char i : modifyBy ) {
             if( !isdigit(i) ) {
-                std::cout << this->formatErr( "modifier rule: unknown modifer" );
+                std::cout << this->formatErr( "modifier rule: unknown modifier" );
                 return 1;
             }
         }
@@ -577,12 +587,12 @@ std::string DnDsh::formatStat( const std::string &datum ) {
 
     // print content
     std::ostringstream formatStream;
-    formatStream << BOLDWHITE << stat << RESET << CYAN << ": " << RESET;
+    formatStream << PRIMARY_COLOR << stat << SECONDARY_COLOR << ": " << RESET;
 
     if( ancillaryValueExists ) {
-        formatStream << BOLDWHITE << masterValue << RESET << CYAN << "(" << BOLDRED << ancillaryValue << RESET << CYAN << ")";
+        formatStream << PRIMARY_COLOR << masterValue << SECONDARY_COLOR << "(" << TERTIARY_COLOR << ancillaryValue << SECONDARY_COLOR << ")" << RESET;
     } else {
-        formatStream << BOLDWHITE << masterValue << RESET;
+        formatStream << PRIMARY_COLOR << masterValue << RESET;
     }
 
     formatStream << std::endl;

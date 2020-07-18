@@ -7,6 +7,6 @@ add dnd as a command to set particular commands as defaults for already working 
 now that vim has been added, it's a little difficult trying to know exactly what files exist and what new to make:::::::
 ^^^^ The option of adding all available system commands exists. But it just feels really clunky calling system
 ^^^^ The option of adding cd, ls, and mkdir also exists, but makes me feel like I'm cheap
-Longer stories can have a .stt extention for 'story attribute'. These won't be printed by ls unless a specific flag is set (sto) (.stt)
-^^^^ Attribute will can have a .ett extention for 'extended attribute' (.ett)
-^^^^ Character's main list of attributes will be stored in .att files for 'attribute' (.att)
+Longer stories can have a .sto extention for 'story attribute'. These won't be printed by ls unless a specific flag is set (sto) (.sto)
+^^^^ Attribute will can have a .ett extention for 'extended attribute' (.ett) The difference between sto is etts can still be saved in an external file and will be printed. But stos need an sto flag
+^^^^ Character's main list of attributes will be stored in .com files for 'compilation' (.com)

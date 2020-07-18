@@ -125,7 +125,8 @@ int DnDsh::cmd_ROLL( const std::string &command ) {
 }
 
 
-// Sample Usage:    stat [<key>]           //NOTE: [<key>] entered empty will print out every stat
+// Sample Usage:    ls [<key>]           //NOTE: [<key>] entered empty will print out every stat
+//                  ls sto
 int DnDsh::cmd_LIST( const std::string &key ) {
 
     if( key.empty() ) {
@@ -191,7 +192,7 @@ int DnDsh::cmd_HELP( const std::string &command ) {
 int DnDsh::cmd_SPELL( std::list<std::string> &spellEntry ) {
 
     std::string level = spellEntry.front();
-    spellEntry.pop_front();  
+    spellEntry.pop_front();
 
     if( level.empty() ) {
         std::cout << this->formatErr( INCORRECT_USAGE_ERR(spell) );
@@ -438,7 +439,7 @@ int DnDsh::cmd_STORE( const std::string &path ) {
         std::cout << this->formatErr( FILE_ACCESS_FAIL_ERR );
         return 1;
     }
-
+ 
     for( std::string outputDatum : this->characterData ) {
         file << outputDatum << std::endl;
     }
@@ -579,7 +580,7 @@ std::string DnDsh::formatStat( const std::string &datum ) {
  
 
     // if masterValue is a path, find and load content from path to document
-    bool masterValueIsFile = masterValue.find(".csv") < datum.size();
+    bool masterValueIsFile = masterValue.rfind(".ett") < datum.size();
     if( masterValueIsFile ) {
         masterValue.clear();
         std::ifstream file( masterValue );
